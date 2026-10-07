@@ -15,13 +15,11 @@ Windows.
 This is an unofficial fan project. It is not affiliated with or endorsed by Everguild or Games
 Workshop. It contains no game files: you need your own copy of the game.
 
-> **Status: works, but one piece cannot be downloaded from here yet.**
-> The whole chain below has been run on one phone (a Pixel 8 Pro on Android 17): the game starts,
-> signs in, plays matches and updates its mod from the server. What this repository does not hold
-> is the *loader package* the patcher needs (step 3). It contains files generated from the game's
-> own code, which are not ours to publish. See [What is not here, and why](#what-is-not-here-and-why).
-> Until a step that generates those files from your own copy of the game exists, the patcher
-> cannot be completed from this repository alone.
+> **Status: works on one phone.**
+> The whole chain below has been run on a Pixel 8 Pro on Android 17: the game starts, signs in,
+> plays matches and updates its mod from the server. Other phones and Android versions are
+> untested; if it fails on yours, the logs (see [If something goes wrong](#if-something-goes-wrong))
+> are what is needed to find out why.
 
 ---
 
@@ -78,19 +76,17 @@ Do one of these:
 If your copy is split into `.z01` / `.z02` / `.zip` parts, open the `.zip` part with 7-Zip and
 take the `.xapk` out first.
 
-### 3. Add the loader package
+### 3. Nothing to do: the loader package is included
 
-The patcher expects the loader package in `patcher\tool` as `melon_data.zip` (or in pieces named
-`melon_data.zip.part0`, `.part1`, `.part2`, which it joins itself).
-
-This is the piece that is not in this repository; see
-[What is not here, and why](#what-is-not-here-and-why) for what it contains and how it is built.
+The loader itself comes with the patcher, in `patcher\tool` as `melon_data.zip.part0`, `.part1`
+and `.part2`. `1 - patch.bat` joins them. It is built for **game version 1.35.0** only; see
+[The loader package](#the-loader-package) for what is inside.
 
 ### 4. Patch
 
 Double-click **`1 - patch.bat`**. It:
 
-1. joins the patching program from its two halves,
+1. joins the patching program and the loader package from their pieces,
 2. unpacks your `.xapk` if you gave it one,
 3. puts the mod loader into the game and signs the result.
 
@@ -217,6 +213,7 @@ A server needs two things for phones, both described in the
 | `patcher/3 - get phone logs.bat` | Collects the phone's logs. |
 | `patcher/4 - put mod on phone.bat` | Copies the mod from `patcher\mods` to the phone. |
 | `patcher/tool/LemonPatch.exe.part0`, `.part1` | The patching program, in two halves (joined on every run). |
+| `patcher/tool/melon_data.zip.part0` to `.part2` | The loader package, in three pieces (joined on every run). |
 | `patcher/LemonPatch-source.cs`, `LemonPatch.csproj`, `LemonPatch-core-change.diff` | Its source: a small command-line front end, and two changes to LemonLoader's installer code. |
 | `loader-changes/` | The changes made to the mod loader itself, as diffs against the public sources. |
 
@@ -249,8 +246,8 @@ are what it took:
 - The game's name and versions are read from a small text file instead of the 700 MB data file.
 - The short (4-byte) kind of hook is used only for functions too short for a normal one. Using
   it everywhere made the game fail at random on start.
-- The interface files generated from the game are taken ready-made from the package, because the
-  tools that generate them do not run on a phone.
+- The interface files are taken ready-made from the package (see [The loader package](#the-loader-package)),
+  because the tools that generate them do not run on a phone.
 
 `il2cppinterop-arm64.diff` (against LemonLoader/Il2CppInteropARM64 `f194da0`)
 
@@ -265,21 +262,33 @@ The function positions make this loader specific to **game version 1.35.0, 64-bi
 
 ---
 
+## The loader package
+
+`melon_data.zip` is what the patcher puts into the game. It holds:
+
+1. **The mod loader**, built from the public sources with the changes in `loader-changes/`.
+2. **The .NET runtime** the loader runs on (Microsoft, MIT licence), and the small native
+   libraries it needs (Dobby, OpenSSL, the C++ runtime).
+3. **Interface files**: about 170 small libraries in `MelonLoader/Il2CppAssemblies` that describe
+   the game's classes and functions so that a mod can call them. They are generated from the game
+   by the loader's standard tools (Cpp2IL and Il2CppInterop). Normally that happens on the device
+   at first start; those tools do not run on a phone for this game, so it was done on a PC and the
+   result is shipped.
+
+**The interface files contain no game code.** Every function in the game's own libraries is
+reduced to a few generated lines that say "call the real function inside the game"; the real
+function stays in your copy of the game and nowhere else. That was checked function by function
+before publishing: of the 58,600 functions in the game's main library, all 58,600 are such
+generated stubs, and none carries any of the game's text. What the files do carry is the *names*
+of the game's classes, functions and fields.
+
+The Unity engine libraries among them (`UnityEngine.*.dll`) are a different case: for the parts of
+the engine the game's build leaves out, the loader's tools fill in Unity's own published library
+code, as every MelonLoader installation does. That is Unity's engine code, not the game's.
+
 ## What is not here, and why
 
-**The game.** Not ours to publish. You supply your own copy.
-
-**The loader package (`melon_data.zip`).** It is a zip of three things:
-
-1. the mod loader built from the public sources with the changes above,
-2. the .NET runtime the loader runs on, and
-3. "interface files": about 170 small libraries that describe the game's own classes and
-   functions, so that a mod can call them. They hold no game code, only names and shapes, but
-   they are generated from the game's code, which makes them game content.
-
-Parts 1 and 2 could be published. Part 3 is why the package is not here: it has to be generated
-from your own copy of the game. The tools for that (Cpp2IL and the Il2CppInterop generator) do not
-run on a phone, so it has to happen on the PC, as part of patching. That step is not written yet.
+**The game.** Not ours to publish. You supply your own copy, and the patcher only works on it.
 
 **Your signing key, your logs, and anything in `game-files`, `patched` or `phone-logs`.** They are
 listed in `.gitignore` so they cannot be committed by accident.
@@ -296,7 +305,7 @@ not in this repository because they are not ours to publish.
 | Folder | Where it comes from |
 |---|---|
 | `refs/net6` | the .NET 6 runtime libraries (`Microsoft.NETCore.App` 6.x) |
-| `refs-android/ml` | `MelonLoader/net6` from the loader package |
+| `refs-android/ml` | `MelonLoader/net6` from the loader package (join the pieces in `patcher\tool`, then unzip) |
 | `refs-android/il2cpp` | `MelonLoader/Il2CppAssemblies` from the loader package (the interface files) |
 
 ```
@@ -335,5 +344,25 @@ apply `LemonPatch-core-change.diff`, use `LemonPatch-source.cs` as the program, 
 - `loader-changes/melonloader-lemonloader-0.7.diff` changes MelonLoader (Apache-2.0).
 - `loader-changes/il2cppinterop-arm64.diff` changes Il2CppInterop (LGPL-3.0).
 
-Only use LemonLoader from <https://github.com/LemonLoader>. There are look-alike download sites
-with the same name.
+- The loader package contains MelonLoader/LemonLoader (Apache-2.0), Il2CppInterop (LGPL-3.0), the
+  .NET runtime (MIT), HarmonyX (MIT), Dobby (Apache-2.0) and other libraries under their own
+  licences; `MelonLoader/Documentation` and `dotnet/` inside the package hold the notices.
+
+## Thanks
+
+None of this would exist without other people's work, given away freely:
+
+- **The LemonLoader team** ([github.com/LemonLoader](https://github.com/LemonLoader)), who brought
+  MelonLoader to Android, wrote the installer the patcher here is built on, and maintain the
+  ARM64 version of Il2CppInterop. Running a Unity game's mods on a phone at all is their
+  achievement; this project only adjusted their loader for one game.
+- **LavaGang and the MelonLoader contributors** ([github.com/LavaGang/MelonLoader](https://github.com/LavaGang/MelonLoader)),
+  for the mod loader both the Windows and the Android mod run on.
+- **The BepInEx team**, for [Il2CppInterop](https://github.com/BepInEx/Il2CppInterop) and
+  [HarmonyX](https://github.com/BepInEx/HarmonyX), which let a mod call into and patch the game.
+- **Samboy and the Cpp2IL contributors** ([github.com/SamboyCoding/Cpp2IL](https://github.com/SamboyCoding/Cpp2IL)),
+  whose tool reads the game's structure.
+- **jmpews**, for [Dobby](https://github.com/jmpews/Dobby), the hooking library underneath.
+
+If you use this, consider supporting those projects. And only get LemonLoader from
+<https://github.com/LemonLoader>: there are look-alike download sites with the same name.

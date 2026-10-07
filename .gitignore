@@ -21,8 +21,6 @@ patcher/tool/platform-tools/
 # joined on every run from the .part files
 patcher/tool/LemonPatch.exe
 patcher/tool/melon_data.zip
-# the loader package holds files generated from the game (see README: "What is not here")
-patcher/tool/melon_data.zip.part*
 # mods you drop in for bat 4 (the published build is under releases/)
 patcher/mods/*.dll
 # editor files

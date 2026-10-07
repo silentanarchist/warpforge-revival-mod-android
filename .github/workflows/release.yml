@@ -1,0 +1,52 @@
+# Publishes a Release for every build zip committed under releases/.
+# Adding releases/WarpforgeRevival.Android-<version>.zip to main is all it takes: this creates the
+# tag v<version> and a Release with that zip attached. Builds that already have a Release
+# are left alone.
+name: Release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "releases/*.zip"
+      - ".github/workflows/release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create missing releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          shopt -s nullglob
+          for zip in releases/WarpforgeRevival.Android-*.zip; do
+            version="$(basename "$zip" .zip)"
+            version="${version#WarpforgeRevival.Android-}"
+            tag="v${version}"
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo "$tag already published"
+              continue
+            fi
+            {
+              echo "Android build for game version 1.35.0."
+              echo
+              echo "This is the mod only. The game on the phone has to be patched with the mod loader first:"
+              echo "follow the README of this repository."
+              echo
+              echo "**Install**"
+              echo "1. Unzip. Copy \`WarpforgeRevival.Android.dll\` into the patcher's \`mods\` folder and run \`4 - put mod on phone.bat\`,"
+              echo "   or copy it on the phone into \`MelonLoader/com.Everguild.WarhammerWarpforge/Mods/\`."
+              echo "2. Start the game."
+              echo
+              echo "The source for this build is the code at this tag."
+            } > notes.md
+            gh release create "$tag" "$zip" --target "$GITHUB_SHA" --title "Warpforge Revival mod for Android ${version}" --notes-file notes.md
+            echo "published $tag"
+          done

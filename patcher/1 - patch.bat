@@ -72,15 +72,14 @@ goto :end
 :nogame
 echo  The game's files are not here yet. Do ONE of these, then run this again:
 echo.
-echo    a) put the game's .xapk file in this folder
+echo    a) put your backup of the game (one .apks or .xapk file) in this folder
 echo         %~dp0
 echo    b) or put its three .apk files in the "game-files" folder:
 echo         com.Everguild.WarhammerWarpforge.apk
 echo         config.arm64_v8a.apk
 echo         UnityDataAssetPack.apk
 echo.
-echo  If your copy is split into .z01 / .z02 / .zip parts, open the .zip part
-echo  with 7-Zip first and take the .xapk out of it.
+echo  The game has to be version 1.35.0.
 if not exist "game-files" mkdir "game-files"
 goto :end
 :unpackfailed

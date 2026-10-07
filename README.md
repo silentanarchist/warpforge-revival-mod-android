@@ -48,9 +48,11 @@ backup at the top of this page: do that now if you have not.
 
 - A Windows PC and a USB cable.
 - An Android phone with a 64-bit ARM processor (every current phone). Tested on Android 17 only.
-- Your own copy of the Android game, version **1.35.0**, as its three files:
+- Your own copy of the Android game, version **1.35.0**: a backup of the app you made from your
+  own phone. A backup app saves it as one file of about 780 MB, usually named something like
+  `Warhammer 40,000 Warpforge_1.35.0.apks` (or `.xapk`). Whatever the name, make sure the
+  version in it is 1.35.0: other versions will not work. Inside are the game's three parts:
   `com.Everguild.WarhammerWarpforge.apk`, `config.arm64_v8a.apk` and `UnityDataAssetPack.apk`.
-  They usually come packed together as one `.xapk` file (about 780 MB).
 - About 3 GB of free disk space on the PC, and about 2 GB free on the phone.
 - Google's "SDK Platform-Tools for Windows" (the `adb` program), from
   <https://developer.android.com/tools/releases/platform-tools>.
@@ -87,11 +89,8 @@ folder.
 
 Do one of these:
 
-- put the game's `.xapk` file straight into the `patcher` folder, **or**
+- put your backup file (`.apks` or `.xapk`) straight into the `patcher` folder, **or**
 - put its three `.apk` files into `patcher\game-files`.
-
-If your copy is split into `.z01` / `.z02` / `.zip` parts, open the `.zip` part with 7-Zip and
-take the `.xapk` out first.
 
 ### 3. Nothing to do: the loader package is included
 
@@ -104,7 +103,7 @@ and `.part2`. `1 - patch.bat` joins them. It is built for **game version 1.35.0*
 Double-click **`1 - patch.bat`**. It:
 
 1. joins the patching program and the loader package from their pieces,
-2. unpacks your `.xapk` if you gave it one,
+2. unpacks your backup file if you gave it one,
 3. puts the mod loader into the game and signs the result.
 
 The big data file takes a few minutes. When it finishes, the `patched` folder holds three files:
@@ -354,16 +353,19 @@ apply `LemonPatch-core-change.diff`, use `LemonPatch-source.cs` as the program, 
 
 ## Licences
 
-- The mod (`WarpforgeRevival/`, `WarpforgeRevival.Android/`) and the scripts: MIT, see
-  [LICENSE](LICENSE). The licence covers this project's code only, not the game.
-- `LemonPatch.exe` and the files describing it: GPL-3.0, as LemonLoader's installer is. See
-  `patcher/LICENSE-LemonLoader-installer.txt`.
-- `loader-changes/melonloader-lemonloader-0.7.diff` changes MelonLoader (Apache-2.0).
-- `loader-changes/il2cppinterop-arm64.diff` changes Il2CppInterop (LGPL-3.0).
+Short version; [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) has the full list, the copyright
+holders, the exact upstream commits and what was changed, and [`licenses/`](licenses) has the
+licence texts.
 
-- The loader package contains MelonLoader/LemonLoader (Apache-2.0), Il2CppInterop (LGPL-3.0), the
-  .NET runtime (MIT), HarmonyX (MIT), Dobby (Apache-2.0) and other libraries under their own
-  licences; `MelonLoader/Documentation` and `dotnet/` inside the package hold the notices.
+- **This project's own work** (the mod in `WarpforgeRevival/` and `WarpforgeRevival.Android/`,
+  the scripts, this documentation): MIT, see [LICENSE](LICENSE). It covers this project's work
+  only, not the game.
+- **`LemonPatch.exe`** and the files it is built from: GPL-3.0, as LemonLoader's installer is.
+- **The loader in `melon_data.zip`**: MelonLoader / LemonLoader under Apache-2.0 and
+  Il2CppInterop under LGPL-3.0, both changed by this project; the diffs are in
+  `loader-changes/`.
+- **Everything else in the loader package** (.NET runtime, HarmonyX, MonoMod, Cpp2IL, Dobby,
+  OpenSSL and others) is unchanged and stays under its own licence.
 
 ## Thanks
 

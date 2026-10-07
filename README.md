@@ -1,5 +1,21 @@
 # Warpforge Revival for Android
 
+> ## ⚠️ Back up your game files first, before anything else
+>
+> **Installing this erases the game's downloaded files from your phone, and they cannot be
+> downloaded again from anywhere.**
+>
+> Before you download, patch or install anything, connect the phone to a PC and copy this folder
+> off the phone:
+>
+> ```
+> Android/data/com.Everguild.WarhammerWarpforge/files
+> ```
+>
+> Check that the copy finished and the folder on the PC is not empty. Only then carry on. If your
+> phone might hold a newer set of these files than you have saved, do not patch it until you have
+> copied them. Details are under [Before you start](#before-you-start).
+
 Everything needed to run *Warhammer 40,000: Warpforge* on an Android phone against a
 [Warpforge Revival server](https://github.com/silentanarchist/warpforge-revival-server), now that
 the game's own servers are closed:
@@ -25,7 +41,8 @@ Workshop. It contains no game files: you need your own copy of the game.
 
 ## Before you start
 
-Read this part first. Two of these points cost people their data if skipped.
+Read this part first. Two of these points cost people their data if skipped. The first is the
+backup at the top of this page: do that now if you have not.
 
 **What you need**
 

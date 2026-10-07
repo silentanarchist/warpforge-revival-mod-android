@@ -237,7 +237,8 @@ A server needs two things for phones, both described in the
 
 `LemonPatch.exe` is LemonLoader's official patching code
 ([LemonLoader/MelonLoaderInstaller](https://github.com/LemonLoader/MelonLoaderInstaller), commit
-`ac443fc`, GPL-3.0) with a command-line front end and two changes:
+`ac443fc`, GPL-3.0) with a command-line front end and two changes. Its complete source is the
+[`warpforge-revival` branch of this project's fork](https://github.com/silentanarchist/MelonLoaderInstaller/tree/warpforge-revival):
 
 - **One signing key for every run**, saved next to the tool, so a re-patched game installs over
   the previous one.
@@ -252,7 +253,10 @@ build is for Unity 6000.2.6f1, the game's data is 6000.2.6f2, and the engine the
 The loader is [LemonLoader](https://github.com/LemonLoader/MelonLoader) 0.7 (the Android port of
 MelonLoader) with [Il2CppInteropARM64](https://github.com/LemonLoader/Il2CppInteropARM64). Out of
 the box it did not get this game to its menu on a current phone. The diffs in `loader-changes/`
-are what it took:
+are what it took. The complete changed sources are also published as the `warpforge-revival`
+branch of this project's forks,
+[silentanarchist/MelonLoader](https://github.com/silentanarchist/MelonLoader/tree/warpforge-revival) and
+[silentanarchist/Il2CppInteropARM64](https://github.com/silentanarchist/Il2CppInteropARM64/tree/warpforge-revival):
 
 `melonloader-lemonloader-0.7.diff` (against LemonLoader/MelonLoader `7b14dac3`)
 
@@ -265,7 +269,8 @@ are what it took:
 - The interface files are taken ready-made from the package (see [The loader package](#the-loader-package)),
   because the tools that generate them do not run on a phone.
 
-`il2cppinterop-arm64.diff` (against LemonLoader/Il2CppInteropARM64 `f194da0`)
+`il2cppinterop-arm64.diff` (against `f194da0` in the fork: LemonLoader/Il2CppInteropARM64 master
+`a60ebf5` plus six fixes taken from [BepInEx/Il2CppInterop](https://github.com/BepInEx/Il2CppInterop))
 
 - Text returned by the game's runtime is no longer freed by the loader (that crashed the app).
 - The positions of six runtime functions are listed for this exact game build, because the
@@ -332,9 +337,11 @@ The result is `WarpforgeRevival.Android/bin/Release/net6.0/WarpforgeRevival.Andr
 
 ### The loader
 
-1. Check out `LemonLoader/Il2CppInteropARM64` at `f194da0`, apply `il2cppinterop-arm64.diff`, and
-   build it: `dotnet build Il2CppInterop.HarmonySupport -c Release -p:VersionSuffix=arm64c`.
-2. Check out `LemonLoader/MelonLoader` at `7b14dac3` and apply `melonloader-lemonloader-0.7.diff`.
+1. Check out the `warpforge-revival` branch of
+   [silentanarchist/Il2CppInteropARM64](https://github.com/silentanarchist/Il2CppInteropARM64/tree/warpforge-revival)
+   and build it: `dotnet build Il2CppInterop.HarmonySupport -c Release -p:VersionSuffix=arm64c`.
+2. Check out the `warpforge-revival` branch of
+   [silentanarchist/MelonLoader](https://github.com/silentanarchist/MelonLoader/tree/warpforge-revival).
    Make the Il2CppInterop build from step 1 available to it as a local NuGet source.
 3. Build the native part with the .NET 9 SDK and the Android NDK (r27c):
    ```
@@ -345,9 +352,11 @@ The result is `WarpforgeRevival.Android/bin/Release/net6.0/WarpforgeRevival.Andr
 
 ### The patching program
 
-Check out `LemonLoader/MelonLoaderInstaller` at `ac443fc` next to the `patcher` folder as `inst`,
-apply `LemonPatch-core-change.diff`, use `LemonPatch-source.cs` as the program, and publish
-`LemonPatch.csproj` for `win-x64` as a single self-contained file.
+Check out the `warpforge-revival` branch of
+[silentanarchist/MelonLoaderInstaller](https://github.com/silentanarchist/MelonLoaderInstaller/tree/warpforge-revival)
+and publish `LemonPatch/LemonPatch.csproj` for `win-x64` as a single self-contained file. (The
+copies of the same source in `patcher/` here are for reading; the project file there expects the
+installer checked out next to `patcher` as `inst`.)
 
 ---
 

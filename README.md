@@ -31,6 +31,12 @@ Windows.
 This is an unofficial fan project. It is not affiliated with or endorsed by Everguild or Games
 Workshop. It contains no game files: you need your own copy of the game.
 
+**About AI use.** The mod, the changes to the mod loader and patcher, the scripts and this
+documentation were written largely by an AI assistant (Anthropic's Claude), working under the
+maintainer's direction; the maintainer decided what to build and tested it on real phones. The
+loader changes touch low-level code and have been tried on only a few devices, so expect rough
+edges. Read the code before you rely on it, and please report what you find.
+
 > **Status: works on one phone.**
 > The whole chain below has been run on a Pixel 8 Pro on Android 17: the game starts, signs in,
 > plays matches and updates its mod from the server. Other phones and Android versions are

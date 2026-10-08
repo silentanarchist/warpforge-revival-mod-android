@@ -175,6 +175,10 @@ Start the game. It reaches the menu in about half a minute.
 - Or download a **game login file** from the website's profile page and copy it over with
   **`4 - put game login on phone.bat`** (it finds the file in your Downloads folder).
 - Servers that do not ask for an account sign the phone in with its device id.
+- To play as someone else on the phone, use **Sign out** in **Settings > Account**. It signs out
+  this phone only; the account keeps its progress.
+- Forgotten password: make a **recovery code** on the website's profile page while you still know
+  it and keep the file; **Forgot your password?** on the website's sign-in page uses it.
 
 The mod's version is shown next to the game's in **Settings > General**.
 

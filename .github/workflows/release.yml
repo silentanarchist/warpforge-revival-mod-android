@@ -41,7 +41,7 @@ jobs:
               echo "follow the README of this repository."
               echo
               echo "**Install**"
-              echo "1. Unzip. Copy \`WarpforgeRevival.Android.dll\` into the patcher's \`mods\` folder and run \`4 - put mod on phone.bat\`,"
+              echo "1. Unzip. Copy \`WarpforgeRevival.Android.dll\` into the patcher's \`mods\` folder and run \`3 - put mod on phone.bat\`,"
               echo "   or copy it on the phone into \`MelonLoader/com.Everguild.WarhammerWarpforge/Mods/\`."
               echo "2. Start the game."
               echo

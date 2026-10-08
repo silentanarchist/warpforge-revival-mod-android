@@ -50,6 +50,8 @@ set "P=/sdcard/MelonLoader/com.Everguild.WarhammerWarpforge"
 "%ADB%" -s !DEV! shell mkdir -p %P%/Mods
 rem the earlier test build must not load next to the real mod: it is moved aside, not deleted
 "%ADB%" -s !DEV! shell "mkdir -p %P%/Mods-disabled; if [ -f %P%/Mods/WarpforgeRevival.AndroidTest.dll ]; then mv %P%/Mods/WarpforgeRevival.AndroidTest.dll %P%/Mods-disabled/; fi"
+rem the retired OpenGL graphics plugin is moved aside too (the game then draws the way it chooses itself)
+"%ADB%" -s !DEV! shell "mkdir -p %P%/Plugins-disabled; if [ -f %P%/Plugins/WarpforgeRevival.AndroidGraphics.dll ]; then mv %P%/Plugins/WarpforgeRevival.AndroidGraphics.dll %P%/Plugins-disabled/; fi"
 "%ADB%" -s !DEV! push "mods\WarpforgeRevival.Android.dll" %P%/Mods/WarpforgeRevival.Android.dll
 if errorlevel 1 (
     echo.

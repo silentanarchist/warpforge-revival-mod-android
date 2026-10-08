@@ -16,12 +16,13 @@ patcher/work-temp/
 patcher/patch-log.txt
 patcher/phone-logs/
 patcher/phone-logs.zip
+patcher/uninstall-backup/
 patcher/tool/signing-key.pem
 patcher/tool/platform-tools/
 # joined on every run from the .part files
 patcher/tool/LemonPatch.exe
 patcher/tool/melon_data.zip
-# mods you drop in for bat 4 (the published build is under releases/)
+# mods you drop in for bat 3 (the published build is under releases/)
 patcher/mods/*.dll
 # editor files
 .vs/

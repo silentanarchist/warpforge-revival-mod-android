@@ -169,9 +169,8 @@ Download the latest mod from [Releases](../../releases) (or from `releases/` her
 
 Start the game. It reaches the menu in about half a minute.
 
-- If the server asks for an account, a sign-in window appears while the game loads: enter the
-  name and password of your account on the server's website, or create one there. The phone keeps
-  the sign-in, so it asks only once.
+- If the server asks for an account, a sign-in window appears while the game loads - see
+  **Signing in and making an account** just below.
 - Or download a **game login file** from the website's profile page and copy it over with
   **`4 - put game login on phone.bat`** (it finds the file in your Downloads folder).
 - Servers that do not ask for an account sign the phone in with its device id.
@@ -179,6 +178,29 @@ Start the game. It reaches the menu in about half a minute.
   this phone only; the account keeps its progress.
 - Forgotten password: make a **recovery code** on the website's profile page while you still know
   it and keep the file; **Forgot your password?** on the website's sign-in page uses it.
+
+#### Signing in and making an account
+
+When the server needs an account, this window appears while the game loads:
+
+![The sign-in window: Name and Password boxes, then Sign in, Create account and Quit](docs/sign-in-window.png)
+
+**New player? Make your account right here - there is no separate form.**
+
+1. In **Name**, type the name you want (2 to 30 letters, digits, `.` `'` `-` or `_`, no spaces).
+2. In **Password**, type the password you want (at least 6 characters, no spaces; do not reuse one
+   from another site).
+3. Press **Create account**. The account is made with what you typed and the game signs in.
+
+Pressing **Create account** with the boxes empty only says "Enter a name and a password." - fill
+them in first, then press it.
+
+**Already have an account** (made here or on the server's website)? Type its name and password
+and press **Sign in**. The game remembers the sign-in, so it asks only once on each computer or
+phone. The same account works everywhere and keeps the same decks and progress.
+
+Afterwards, on the server's website (its profile page) you can make a **recovery code** in case you
+forget your password. **Sign out** in **Settings > Account** signs out this device only.
 
 The mod's version is shown next to the game's in **Settings > General**.
 

@@ -25,8 +25,9 @@ the game's own servers are closed:
 - **the changes made to that mod loader** so it runs this game on current phones.
 
 The Windows mod is in [warpforge-revival-mod](https://github.com/silentanarchist/warpforge-revival-mod).
-Both are built from the same source and numbered together: `x.y.z-a` for Android, `x.y.z-w` for
-Windows.
+Both are built from the same source and numbered `x.y.z.f-a` for Android and `x.y.z.f-w` for
+Windows: `x.y.z` is the shared code and always the same on both; `f` counts fixes made for one of
+them only, is left off while it is 0 (`0.12.1-a`), and starts again with every new `x.y.z`.
 
 This is an unofficial fan project. It is not affiliated with or endorsed by Everguild or Games
 Workshop. It contains no game files: you need your own copy of the game.

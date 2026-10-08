@@ -48,9 +48,9 @@ echo  Closing the game if it is running ...
 echo  Starting %ACT% with OpenGL ES ...
 "%ADB%" -s !DEV! shell am start -n %ACT% -e unity "-force-gles"
 echo.
-echo  Play as usual. Restart it with this file each time while testing, then tell
-echo  Claude whether the black screen happened. "3 - get phone logs.bat" shows
-echo  which way it was drawn.
+echo  Play as usual. Restart it with this file each time while testing. If the black
+echo  screen never comes back this way, run "6 - choose OpenGL or Vulkan.bat" and pick 1
+echo  so the game always draws with OpenGL ES, even when started from its icon.
 
 :end
 echo.

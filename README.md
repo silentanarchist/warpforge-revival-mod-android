@@ -162,7 +162,7 @@ Close the game (swipe it away from the recent apps).
 Download the latest mod from [Releases](../../releases) (or from `releases/` here) and unzip it.
 
 - Copy `WarpforgeRevival.Android.dll` into `patcher\mods` and double-click
-  **`4 - put mod on phone.bat`**, **or**
+  **`3 - put mod on phone.bat`**, **or**
 - copy the file on the phone itself into `MelonLoader/com.Everguild.WarhammerWarpforge/Mods/`.
 
 ### 9. Play
@@ -173,7 +173,7 @@ Start the game. It reaches the menu in about half a minute.
   name and password of your account on the server's website, or create one there. The phone keeps
   the sign-in, so it asks only once.
 - Or download a **game login file** from the website's profile page and copy it over with
-  **`5 - put game login on phone.bat`** (it finds the file in your Downloads folder).
+  **`4 - put game login on phone.bat`** (it finds the file in your Downloads folder).
 - Servers that do not ask for an account sign the phone in with its device id.
 
 The mod's version is shown next to the game's in **Settings > General**.
@@ -199,7 +199,7 @@ again. With the same signing key that installs over the old copy and keeps every
 
 ## If something goes wrong
 
-**Collect the logs.** Connect the phone and double-click **`3 - get phone logs.bat`**. It asks:
+**Collect the logs.** Connect the phone and double-click **`0 - get phone logs.bat`**. It asks:
 
 - `1` - the game is closed and you are about to start it. It clears the phone's system log, then
   waits while you start the game and reproduce the problem.
@@ -217,7 +217,7 @@ contain your player id and server address, so do not post them publicly.
 | Black screen for up to a minute on the first start after installing | Wait. It is copying the loader's files; later starts skip it. |
 | The game stops at the title screen with a connection error | The mod is not on the phone (step 8), or the server is not reachable from the phone. |
 | The game closes a few seconds after you open it, right after an update | An older mod build's "Close game" left the app half-closed. Swipe it away from the recent apps and open it again. Fixed from 0.11.9-a. |
-| After signing in the screen flashes big coloured blocks and then stays black until the game is restarted (seen on a Pixel 6 Pro) | Run **`7 - choose OpenGL or Vulkan.bat`** and pick `1` (OpenGL ES). `6 - start game with OpenGL.bat` starts it that way once, for a test. |
+| After signing in the screen flashes big coloured blocks and then stays black until the game is restarted (seen on a Pixel 6 Pro) | Run **`6 - choose OpenGL or Vulkan.bat`** and pick `1` (OpenGL ES). `5 - start game with OpenGL.bat` starts it that way once, for a test. |
 | A start gets stuck before signing in, or closes within seconds, for no clear reason | Swipe the app away and start again. If it keeps happening, collect logs with option `2` before closing it. |
 
 ---
@@ -241,13 +241,13 @@ A server needs two things for phones, both described in the
 | `WarpforgeRevival.Android/` | The project that builds `WarpforgeRevival.Android.dll` from that source. |
 | `WarpforgeRevival.AndroidGraphics/` | A small loader plugin, `WarpforgeRevival.AndroidGraphics.dll`, that makes the game draw with OpenGL ES instead of Vulkan (setting `AndroidGraphics` in `WarpforgeRevival.cfg`). Optional; see "Things seen so far". |
 | `releases/` | Built mods. Each zip committed here is also published under Releases. |
+| `patcher/0 - get phone logs.bat` | Collects the phone's logs when something goes wrong (can be used at any point). |
 | `patcher/1 - patch.bat` | Patches your copy of the game. |
 | `patcher/2 - install on phone.bat` | Installs the patched game over USB. |
-| `patcher/3 - get phone logs.bat` | Collects the phone's logs. |
-| `patcher/4 - put mod on phone.bat` | Copies the mod from `patcher\mods` to the phone. |
-| `patcher/5 - put game login on phone.bat` | Copies a game login file from the server's website to the phone. |
-| `patcher/6 - start game with OpenGL.bat` | Starts the game once with OpenGL ES instead of Vulkan (a test). |
-| `patcher/7 - choose OpenGL or Vulkan.bat` | Puts the graphics plugin on the phone (OpenGL ES) or moves it aside (Vulkan). |
+| `patcher/3 - put mod on phone.bat` | Copies the mod from `patcher\mods` to the phone. |
+| `patcher/4 - put game login on phone.bat` | Copies a game login file from the server's website to the phone. |
+| `patcher/5 - start game with OpenGL.bat` | Starts the game once with OpenGL ES instead of Vulkan (a test). |
+| `patcher/6 - choose OpenGL or Vulkan.bat` | Puts the graphics plugin on the phone (OpenGL ES) or moves it aside (Vulkan). |
 | `patcher/tool/LemonPatch.exe.part0`, `.part1` | The patching program, in two halves (joined on every run). |
 | `patcher/tool/melon_data.zip.part0` to `.part2` | The loader package, in three pieces (joined on every run). |
 | `patcher/LemonPatch-source.cs`, `LemonPatch.csproj`, `LemonPatch-core-change.diff` | Its source: a small command-line front end, and two changes to LemonLoader's installer code. |

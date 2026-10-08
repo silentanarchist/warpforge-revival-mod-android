@@ -60,7 +60,7 @@ echo.
 echo  The mod is on the phone. Mods folder now holds:
 "%ADB%" -s !DEV! shell ls -la %P%/Mods
 echo.
-echo  Next: run "3 - get phone logs.bat" and start the game when it asks.
+echo  Next: run "0 - get phone logs.bat" and start the game when it asks.
 
 :end
 echo.

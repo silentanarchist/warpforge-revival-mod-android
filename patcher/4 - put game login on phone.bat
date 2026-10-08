@@ -36,7 +36,7 @@ if exist "tool\platform-tools\adb.exe" set "ADB=%~dp0tool\platform-tools\adb.exe
 if not defined ADB for /f "delims=" %%A in ('where adb 2^>nul') do if not defined ADB set "ADB=%%A"
 if not defined ADB (
     echo  This needs Google's "platform-tools" ^(the adb program^) in tool\platform-tools.
-    echo  See "4 - put test mod on phone.bat" or READ ME.txt.
+    echo  See "3 - put mod on phone.bat" or READ ME.txt.
     goto :end
 )
 

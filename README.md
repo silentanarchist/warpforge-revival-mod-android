@@ -167,8 +167,14 @@ Download the latest mod from [Releases](../../releases) (or from `releases/` her
 
 ### 9. Play
 
-Start the game. It signs in with the phone's device id (no account needed) and reaches the menu
-in about half a minute.
+Start the game. It reaches the menu in about half a minute.
+
+- If the server asks for an account, a sign-in window appears while the game loads: enter the
+  name and password of your account on the server's website, or create one there. The phone keeps
+  the sign-in, so it asks only once.
+- Or download a **game login file** from the website's profile page and copy it over with
+  **`5 - put game login on phone.bat`** (it finds the file in your Downloads folder).
+- Servers that do not ask for an account sign the phone in with its device id.
 
 The mod's version is shown next to the game's in **Settings > General**.
 
@@ -182,6 +188,9 @@ To use a different server, edit `ServerUrl` in
 **The mod updates itself.** When the server has a newer build the game asks, downloads it, checks
 it and installs it, then shows a **Close game** button. Tap it and open the game again. (The
 game's own "Exit" only puts the app in the background, which is why the mod has its own button.)
+
+If the server refuses to sign in because the mod is out of date, the mod downloads the server's
+build straight away, says so, and closes the game after a few seconds; open it again.
 
 **The loader does not.** A new loader means running `1 - patch.bat` and `2 - install on phone.bat`
 again. With the same signing key that installs over the old copy and keeps everything.
@@ -208,6 +217,7 @@ contain your player id and server address, so do not post them publicly.
 | Black screen for up to a minute on the first start after installing | Wait. It is copying the loader's files; later starts skip it. |
 | The game stops at the title screen with a connection error | The mod is not on the phone (step 8), or the server is not reachable from the phone. |
 | The game closes a few seconds after you open it, right after an update | An older mod build's "Close game" left the app half-closed. Swipe it away from the recent apps and open it again. Fixed from 0.11.9-a. |
+| After signing in the screen flashes big coloured blocks and then stays black until the game is restarted (seen on a Pixel 6 Pro) | Run **`7 - choose OpenGL or Vulkan.bat`** and pick `1` (OpenGL ES). `6 - start game with OpenGL.bat` starts it that way once, for a test. |
 | A start gets stuck before signing in, or closes within seconds, for no clear reason | Swipe the app away and start again. If it keeps happening, collect logs with option `2` before closing it. |
 
 ---
@@ -229,11 +239,15 @@ A server needs two things for phones, both described in the
 |---|---|
 | `WarpforgeRevival/` | The mod's source. The same files build the Windows mod; the parts marked `ANDROID_PORT` are the Android differences. Kept in step with [warpforge-revival-mod](https://github.com/silentanarchist/warpforge-revival-mod). |
 | `WarpforgeRevival.Android/` | The project that builds `WarpforgeRevival.Android.dll` from that source. |
+| `WarpforgeRevival.AndroidGraphics/` | A small loader plugin, `WarpforgeRevival.AndroidGraphics.dll`, that makes the game draw with OpenGL ES instead of Vulkan (setting `AndroidGraphics` in `WarpforgeRevival.cfg`). Optional; see "Things seen so far". |
 | `releases/` | Built mods. Each zip committed here is also published under Releases. |
 | `patcher/1 - patch.bat` | Patches your copy of the game. |
 | `patcher/2 - install on phone.bat` | Installs the patched game over USB. |
 | `patcher/3 - get phone logs.bat` | Collects the phone's logs. |
 | `patcher/4 - put mod on phone.bat` | Copies the mod from `patcher\mods` to the phone. |
+| `patcher/5 - put game login on phone.bat` | Copies a game login file from the server's website to the phone. |
+| `patcher/6 - start game with OpenGL.bat` | Starts the game once with OpenGL ES instead of Vulkan (a test). |
+| `patcher/7 - choose OpenGL or Vulkan.bat` | Puts the graphics plugin on the phone (OpenGL ES) or moves it aside (Vulkan). |
 | `patcher/tool/LemonPatch.exe.part0`, `.part1` | The patching program, in two halves (joined on every run). |
 | `patcher/tool/melon_data.zip.part0` to `.part2` | The loader package, in three pieces (joined on every run). |
 | `patcher/LemonPatch-source.cs`, `LemonPatch.csproj`, `LemonPatch-core-change.diff` | Its source: a small command-line front end, and two changes to LemonLoader's installer code. |

@@ -211,12 +211,10 @@ To use a different server, edit `ServerUrl` in
 
 ## Updates
 
-**The mod updates itself.** When the server has a newer build the game asks, downloads it, checks
-it and installs it, then shows a **Close game** button. Tap it and open the game again. (The
-game's own "Exit" only puts the app in the background, which is why the mod has its own button.)
-
-If the server refuses to sign in because the mod is out of date, the mod downloads the server's
-build straight away, says so, and closes the game after a few seconds; open it again.
+**The mod updates itself.** When the server has a newer build, the sign-in window says so while
+the game loads, downloads it, checks it and puts it in place, then closes the game after a few
+seconds. Open the game again and it runs the new version. (`AutoUpdate = Off` in
+`WarpforgeRevival.cfg` switches this off.)
 
 **The loader does not.** A new loader means running `1 - patch.bat` and `2 - install on phone.bat`
 again. With the same signing key that installs over the old copy and keeps everything.

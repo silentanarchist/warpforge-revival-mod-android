@@ -15,12 +15,9 @@ echo.
 echo    1 = make the video and put it on the phone
 echo    2 = remove it from the phone again
 echo.
-set "CH="
-set /p "CH=  Choose 1 or 2: "
-if not "%CH%"=="1" if not "%CH%"=="2" (
-    echo  Nothing was changed.
-    goto :end
-)
+choice /c 12 /n /m "  Press 1 or 2: "
+set "CH=1"
+if errorlevel 2 set "CH=2"
 
 set "ADB="
 if exist "tool\platform-tools\adb.exe" set "ADB=%~dp0tool\platform-tools\adb.exe"

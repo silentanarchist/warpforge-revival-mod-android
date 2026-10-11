@@ -42,7 +42,7 @@ edges. Read the code before you rely on it, and please report what you find.
 > The whole chain below has been run on a Pixel 8 Pro on Android 17: the game starts, signs in,
 > plays matches and updates its mod from the server. Other phones and Android versions are
 > untested; if it fails on yours, the logs (see [If something goes wrong](#if-something-goes-wrong))
-> are what is needed to find out why.
+> are what is needed to find out why. 
 
 ---
 

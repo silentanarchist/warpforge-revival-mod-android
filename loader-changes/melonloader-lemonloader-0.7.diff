@@ -78,10 +78,10 @@ index 00000000..0d40c78f
 +"$CLANG" --target=aarch64-linux-android21 -O2 -fPIC -mno-outline-atomics -Wall -Wextra -c faultprobe.c -o ../linux-bionic-arm64/faultprobe.o
 diff --git a/MelonLoader.Bootstrap/Deps/faultprobe/faultprobe.c b/MelonLoader.Bootstrap/Deps/faultprobe/faultprobe.c
 new file mode 100644
-index 00000000..665cb250
+index 00000000..1bf0cf35
 --- /dev/null
 +++ b/MelonLoader.Bootstrap/Deps/faultprobe/faultprobe.c
-@@ -0,0 +1,180 @@
+@@ -0,0 +1,182 @@
 +/*
 + * Warpforge Revival change: a first look at memory faults (SIGSEGV, SIGBUS) on Android.
 + *
@@ -108,6 +108,7 @@ index 00000000..665cb250
 +#include <sys/syscall.h>
 +#include <sys/ucontext.h>
 +#include <dlfcn.h>
++#include <stdlib.h>
 +
 +typedef void *(*domain_get_fn)(void);
 +typedef void *(*jit_find_fn)(void *, void *);
@@ -115,8 +116,8 @@ index 00000000..665cb250
 +static domain_get_fn mono_domain_get_p;
 +static jit_find_fn mono_jit_info_table_find_p;
 +static struct sigaction prev_segv, prev_bus;          /* Mono's handlers, installed before this one */
-+static struct sigaction android_segv, android_bus;    /* Android's, saved before any runtime started */
-+static int have_android_segv, have_android_bus;
++static struct sigaction android_abort;                /* Android's SIGABRT handler, saved before any runtime started */
++static int have_android_abort;
 +static volatile int reported;
 +static void (*log_write)(int, const char *, const char *);   /* liblog, looked up at install time */
 +
@@ -232,17 +233,19 @@ index 00000000..665cb250
 +        m = put(m, ", thread "); m = put_dec(m, (int64_t)syscall(SYS_gettid));
 +        *m = 0; out(msg);
 +        show_maps(addr, pc);
-+        out("[fault] handing the fault to Android for its crash report");
++        out("[fault] ending the game through Android's crash report (abort on this thread)");
 +    }
 +
-+    /* Android's handler back in place; returning re-runs the faulting instruction, which faults again. */
-+    if (sig == SIGSEGV && have_android_segv) sigaction(SIGSEGV, &android_segv, 0);
-+    else if (sig == SIGBUS && have_android_bus) sigaction(SIGBUS, &android_bus, 0);
-+    else { signal(sig, SIG_DFL); }
++    /* Android's own crash report comes from an abort on this very thread: its report then shows this
++       thread's stack, and the unwinder walks through the signal frame down to the faulting code and
++       its callers. (Putting the saved SIGSEGV action back and returning only ended the game silently:
++       what the loader had saved for SIGSEGV was the plain default.) */
++    if (have_android_abort) sigaction(SIGABRT, &android_abort, 0);
++    abort();
 +}
 +
 +/* android_* are the struct sigaction bytes saved at start-up (may be null); runtime is a dlopen handle of libcoreclr.so. */
-+int wf_faultprobe_install(const void *android_segv_bytes, const void *android_bus_bytes, void *runtime)
++int wf_faultprobe_install(const void *android_abort_bytes, void *runtime)
 +{
 +    void *liblog = dlopen("liblog.so", RTLD_NOW);
 +    if (liblog) log_write = (void (*)(int, const char *, const char *))dlsym(liblog, "__android_log_write");
@@ -251,8 +254,7 @@ index 00000000..665cb250
 +        mono_jit_info_table_find_p = (jit_find_fn)dlsym(runtime, "mono_jit_info_table_find");
 +    }
 +    if (!mono_domain_get_p || !mono_jit_info_table_find_p) return -1;     /* cannot tell managed from native: stay out */
-+    if (android_segv_bytes) { memcpy(&android_segv, android_segv_bytes, sizeof android_segv); have_android_segv = 1; }
-+    if (android_bus_bytes) { memcpy(&android_bus, android_bus_bytes, sizeof android_bus); have_android_bus = 1; }
++    if (android_abort_bytes) { memcpy(&android_abort, android_abort_bytes, sizeof android_abort); have_android_abort = 1; }
 +
 +    struct sigaction sa; memset(&sa, 0, sizeof sa);
 +    sa.sa_sigaction = handler;
@@ -415,7 +417,7 @@ index be422c61..98b65388 100644
      }
  }
 diff --git a/MelonLoader.Bootstrap/Proxy/Android/StdRedirect.cs b/MelonLoader.Bootstrap/Proxy/Android/StdRedirect.cs
-index ea956fb0..3dfff01d 100644
+index ea956fb0..85985785 100644
 --- a/MelonLoader.Bootstrap/Proxy/Android/StdRedirect.cs
 +++ b/MelonLoader.Bootstrap/Proxy/Android/StdRedirect.cs
 @@ -1,9 +1,176 @@
@@ -507,18 +509,18 @@ index ea956fb0..3dfff01d 100644
 +
 +    // Deps/faultprobe/faultprobe.c, linked into libmain: looks at every memory fault before the runtime does.
 +    // Faults in managed code go on to the runtime (that is how a NullReferenceException starts); a fault in
-+    // native code is logged with its address and the memory mappings around it ("[fault]" lines), then
-+    // handed to Android's own crash handler, which writes the full report and ends the game at once.
++    // native code is logged with its address and the memory mappings around it ("[fault]" lines), then the
++    // thread aborts through Android's own abort handler, which writes the full report and ends the game at once.
 +    [System.Runtime.InteropServices.LibraryImport("*", EntryPoint = "wf_faultprobe_install")]
 +    [System.Runtime.InteropServices.UnmanagedCallConv(CallConvs = [typeof(System.Runtime.CompilerServices.CallConvCdecl)])]
-+    private static partial int FaultProbeInstall(IntPtr androidSegv, IntPtr androidBus, IntPtr runtime);
++    private static partial int FaultProbeInstall(IntPtr androidAbort, IntPtr runtime);
 +
 +    /// <summary>Called once the runtime has its own fault handlers in place; `runtime` is libcoreclr's handle.</summary>
 +    public static void InstallFaultProbe(IntPtr runtime)
 +    {
 +        try
 +        {
-+            int rc = FaultProbeInstall(androidSegvHandler, androidBusHandler, runtime);
++            int rc = FaultProbeInstall(androidAbortHandler, runtime);
 +            if (rc == 0) Core.Logger.Msg("Fault probe in place: a crash in native code is logged with its address and goes to Android's crash report");
 +            else Core.Logger.Warning($"Fault probe not installed ({rc}); crashes are reported the old way");
 +        }
@@ -798,10 +800,10 @@ index 5b01af4d..007873f4 100644
  
  [StructLayout(LayoutKind.Sequential)]
 diff --git a/MelonLoader.Bootstrap/Utils/Dobby.cs b/MelonLoader.Bootstrap/Utils/Dobby.cs
-index f9f16298..6254548f 100644
+index f9f16298..d7f9f50c 100644
 --- a/MelonLoader.Bootstrap/Utils/Dobby.cs
 +++ b/MelonLoader.Bootstrap/Utils/Dobby.cs
-@@ -13,8 +13,68 @@ public static partial class Dobby
+@@ -13,8 +13,63 @@ public static partial class Dobby
      [UnmanagedCallConv(CallConvs = [typeof(CallConvCdecl)])]
      private static partial int Destroy(nint target);
  
@@ -833,23 +835,18 @@ index f9f16298..6254548f 100644
 +        try
 +        {
 +            uint* code = (uint*)target;
++            // Warpforge Revival change (3): a function that already carries a hook starts with the hook's own
++            // stub (ldr x17, #8 / br x17); that br is not the function's end. Seen when a 16-byte hook on a
++            // 4-byte function had spilled into the next one. Hooking it again gets the normal kind.
++            if (code[0] == 0x58000051 && code[1] == 0xD61F0220) return false;
 +            for (int i = 0; i < 3; i++)
 +            {
 +                uint insn = code[i];
 +                if (insn == 0xD65F03C0) return true;                      // ret
-+                if ((insn & 0xFC000000) == 0x14000000)                    // b <somewhere>
-+                {
-+                    // Warpforge Revival change (3): a jump that lands inside the 16 bytes a normal hook
-+                    // overwrites is padding (e.g. AlliancesTab.ToFocus starts with a jump to its own next
-+                    // instruction), not the end of the function; the code goes on past the window. Treating
-+                    // it as the end gave that function the 4-byte hook every start, and that hook's relay is
-+                    // the only thing in the game placed at a chosen address (MAP_FIXED) - suspected of landing
-+                    // on the runtime's memory now and then (crashes while the hooks were being applied).
-+                    long offset = ((int)(insn << 6) >> 6) * 4L;              // signed imm26 * 4
-+                    long dest = (long)target + i * 4 + offset;
-+                    if (dest > (long)target && dest < (long)target + 16) continue;
-+                    return true;
-+                }
++                if ((insn & 0xFC000000) == 0x14000000) return true;       // b <somewhere> (a jump to the very next
++                                                                          // address can be a tail call into the next
++                                                                          // function - AlliancesTab.ToFocus is exactly
++                                                                          // that - so it counts as the end too)
 +                if ((insn & 0xFFFFFC1F) == 0xD61F0000) return true;       // br xN
 +            }
 +        }

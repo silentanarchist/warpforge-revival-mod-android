@@ -336,8 +336,8 @@ branch of this project's forks,
   to 40 seconds of black screen each time).
 - The game's name and versions are read from a small text file instead of the 700 MB data file.
 - The short (4-byte) kind of hook is used only for functions too short for a normal one. Using
-  it everywhere made the game fail at random on start. A jump that lands within the function's
-  own first 16 bytes (compiler padding) no longer counts as "too short".
+  it everywhere made the game fail at random on start. A function that already carries a hook is
+  not taken for a short one.
 - The interface files are taken ready-made from the package (see [The loader package](#the-loader-package)),
   because the tools that generate them do not run on a phone.
 

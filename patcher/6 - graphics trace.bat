@@ -8,7 +8,7 @@ echo  Warpforge for Android - graphics trace
 echo  --------------------------------------
 echo  Records what the phone does while the game starts: CPU and GPU speeds, which
 echo  core ran what, every frame the screen showed (late or dropped ones), phone
-echo  temperature and slow-downs from heat, and memory. About 90 seconds.
+echo  temperature and slow-downs from heat, and memory, until you press a key.
 echo  Nothing on the phone is changed, and the game itself is not touched.
 echo.
 set "ADB="
@@ -64,15 +64,22 @@ if errorlevel 1 (
     type "!OUT!\trace-start.txt"
     goto :end
 )
+set "TPID="
+for /f %%P in ('powershell -NoProfile -Command "((Get-Content -Raw '!OUT!\trace-start.txt') -replace '\D','')"') do set "TPID=%%P"
+if not defined TPID echo  ^(Could not read the trace's number; it will stop by itself after 5 minutes.^)
 echo.
-echo  RECORDING NOW. Open the game on the phone, and let it load to the menu.
-echo  Touch nothing else on the phone. The recording stops by itself after
-echo  90 seconds; wait for this window to say it is done.
+echo  RECORDING NOW. Open the game on the phone and do what you want to look at.
+echo  When it has happened, press any key here: the recording goes on for
+echo  10 more seconds and then stops. ^(It stops by itself after 5 minutes.^)
 echo.
-powershell -NoProfile -Command "for ($i = 90; $i -gt 0; $i -= 5) { Write-Host ('   ' + $i + ' s left'); Start-Sleep 5 }"
-echo.
+pause >nul
+echo  Recording 10 more seconds ...
+powershell -NoProfile -Command "for ($i = 10; $i -gt 0; $i -= 1) { Write-Host -NoNewline ('  ' + $i); Start-Sleep 1 }; Write-Host ''"
+if defined TPID "%ADB%" -s !DEV! shell "kill -TERM !TPID!" >nul 2>&1
 echo  Waiting for the phone to finish writing the trace ...
-powershell -NoProfile -Command "Start-Sleep 8"
+for /l %%W in (1,1,30) do (
+    "%ADB%" -s !DEV! shell "kill -0 !TPID! 2>/dev/null && echo running" 2>nul | find "running" >nul && powershell -NoProfile -Command "Start-Sleep 1"
+)
 
 echo  Saving ...
 "%ADB%" -s !DEV! pull /data/misc/perfetto-traces/warpforge.pftrace "!OUT!\warpforge.pftrace" > "!OUT!\pull-result.txt" 2>&1

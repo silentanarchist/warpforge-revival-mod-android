@@ -301,10 +301,10 @@ index 75afae3c..8af07e81 100644
  #endif
 \ No newline at end of file
 diff --git a/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/Il2CppHandler.cs b/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/Il2CppHandler.cs
-index 4bd697fc..50191ddc 100644
+index 4bd697fc..34169deb 100644
 --- a/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/Il2CppHandler.cs
 +++ b/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/Il2CppHandler.cs
-@@ -59,8 +59,34 @@ internal static class Il2CppHandler
+@@ -59,8 +59,64 @@ internal static class Il2CppHandler
          return domain;
      }
  
@@ -312,22 +312,52 @@ index 4bd697fc..50191ddc 100644
 +    [DllImport("libc.so", EntryPoint = "setenv")]
 +    private static extern int SetEnv(string name, string value, int overwrite);
 +
-+    // Warpforge Revival change: a larger first area ("nursery") for the loader's .NET memory, so it has
-+    // to clean up far less often while the mod starts. On a Pixel 6 Pro the runtime crashed while
-+    // allocating during start-up; every clean-up stops all threads with signals that the game's own
-+    // garbage collector also uses, so fewer clean-ups means fewer chances to collide. The default
-+    // nursery is 4 MB; 64 MB is small next to a phone's memory. An already set value is kept.
-+    private const string GcParams = "nursery-size=64m";
++    // Warpforge Revival change: settings for the loader's .NET memory, read before the runtime starts.
++    // On a Pixel 6 Pro the runtime crashed now and then while allocating during start-up. The settings
++    // come from UserData/runtime-gc.txt, which the mod writes, so a new setting can be tried with a
++    // mod update instead of patching the game again; it takes effect at the next start. Only two
++    // runtime variables are read from it (MONO_GC_PARAMS and MONO_GC_DEBUG), each line
++    // "NAME=value" with a short plain value; anything else in the file is ignored. Without the
++    // file the first memory area ("nursery") is made 64 MB instead of 4 MB, so the runtime has to
++    // clean up far less often while the mod starts. A variable that is already set is kept.
++    private const string DefaultGcParams = "nursery-size=64m";
++    private static readonly System.Text.RegularExpressions.Regex SafeValue = new(@"^[A-Za-z0-9=,.\-]{1,200}$");
 +
 +    private static void SetRuntimeMemory()
 +    {
++        var wanted = new Dictionary<string, string> { ["MONO_GC_PARAMS"] = DefaultGcParams };
++        string source = "built-in";
 +        try
 +        {
-+            string? had = Environment.GetEnvironmentVariable("MONO_GC_PARAMS");
-+            if (string.IsNullOrEmpty(had)) SetEnv("MONO_GC_PARAMS", GcParams, 0);
-+            Core.Logger.Msg($"Runtime memory settings: {(string.IsNullOrEmpty(had) ? GcParams : had + " (already set)")}");
++            string file = Path.Combine(LoaderConfig.Current.Loader.BaseDirectory, "UserData", "runtime-gc.txt");
++            if (File.Exists(file) && new FileInfo(file).Length < 4096)
++            {
++                source = "UserData/runtime-gc.txt";
++                wanted.Clear();
++                foreach (string raw in File.ReadAllLines(file))
++                {
++                    string line = raw.Trim();
++                    int eq = line.IndexOf('=');
++                    if (line.Length == 0 || line.StartsWith('#') || eq <= 0) continue;
++                    string name = line.Substring(0, eq).Trim(), value = line.Substring(eq + 1).Trim();
++                    if ((name == "MONO_GC_PARAMS" || name == "MONO_GC_DEBUG") && SafeValue.IsMatch(value)) wanted[name] = value;
++                    else Core.Logger.Msg($"Runtime memory settings: ignored line '{line}'");
++                }
++            }
 +        }
-+        catch (Exception e) { Core.Logger.Error("Could not set the runtime memory settings: " + e.Message); }
++        catch (Exception e) { Core.Logger.Error("Could not read the runtime memory settings: " + e.Message); }
++
++        foreach (var kv in wanted)
++        {
++            try
++            {
++                string? had = Environment.GetEnvironmentVariable(kv.Key);
++                if (string.IsNullOrEmpty(had)) SetEnv(kv.Key, kv.Value, 0);
++                Core.Logger.Msg($"Runtime memory settings ({source}): {kv.Key}={(string.IsNullOrEmpty(had) ? kv.Value : had + " (already set)")}");
++            }
++            catch (Exception e) { Core.Logger.Error("Could not set " + kv.Key + ": " + e.Message); }
++        }
++        if (wanted.Count == 0) Core.Logger.Msg($"Runtime memory settings ({source}): runtime defaults");
 +    }
 +#endif
 +
@@ -339,7 +369,7 @@ index 4bd697fc..50191ddc 100644
          var managedDir = Path.Combine(LoaderConfig.Current.Loader.BaseDirectory, "MelonLoader", DOTNET_VERSION);
          var runtimeConfigPath = Path.Combine(managedDir, "MelonLoader.runtimeconfig.json");
          var nativeHostPath = Path.Combine(managedDir, "MelonLoader.NativeHost.dll");
-@@ -189,6 +215,13 @@ internal static class Il2CppHandler
+@@ -189,6 +245,13 @@ internal static class Il2CppHandler
          mono.SetThreadChecker(MonoCheckThread);
  
          MelonDebug.Log("Installed thread checker");
@@ -353,7 +383,7 @@ index 4bd697fc..50191ddc 100644
      }
  
      private static void MonoUnhandledExceptionHandler(IntPtr exc, IntPtr userData)
-@@ -201,6 +234,11 @@ internal static class Il2CppHandler
+@@ -201,6 +264,11 @@ internal static class Il2CppHandler
  
      private static bool MonoCheckThread(ulong threadId)
      {

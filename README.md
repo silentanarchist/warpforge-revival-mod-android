@@ -290,6 +290,7 @@ A server needs two things for phones, both described in the
 | `patcher/3 - put mod on phone.bat` | Copies the mod from `patcher\mods` to the phone. |
 | `patcher/4 - put game login on phone.bat` | Copies a game login file from the server's website to the phone. |
 | `patcher/5 - uninstall from phone.bat` | Removes the game, the loader and the mod from a phone (copies its settings file and logs to `patcher\uninstall-backup` first). Your account and progress stay on the server. |
+| `patcher/6 - graphics trace.bat` | Records about 90 seconds of what the phone does while the game starts (a Perfetto system trace: CPU and GPU speeds, which core ran what, every frame the screen showed, temperatures, memory) into `patcher\graphics-traces`, for chasing stutters and black screens. The trace settings are `patcher/tool/graphics-trace.cfg`. Changes nothing on the phone. |
 | `patcher/tool/LemonPatch.exe.part0`, `.part1` | The patching program, in two halves (joined on every run). |
 | `patcher/tool/melon_data.zip.part0` to `.part2` | The loader package, in three pieces (joined on every run). |
 | `patcher/LemonPatch-source.cs`, `LemonPatch.csproj`, `LemonPatch-core-change.diff` | Its source: a small command-line front end, and two changes to LemonLoader's installer code. |

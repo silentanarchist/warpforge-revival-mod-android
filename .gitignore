@@ -15,6 +15,7 @@ patcher/patched/
 patcher/work-temp/
 patcher/patch-log.txt
 patcher/phone-logs/
+patcher/graphics-traces/
 patcher/phone-logs.zip
 patcher/uninstall-backup/
 patcher/tool/signing-key.pem

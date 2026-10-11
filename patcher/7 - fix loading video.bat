@@ -28,7 +28,8 @@ if not defined ADB (
 )
 
 set "WORK=work-temp\video"
-set "WEBM=%WORK%\intro.webm"
+rem v2: keyframes where the game seeks when the video is skipped (see the ffmpeg line)
+set "WEBM=%WORK%\intro-v2.webm"
 if "%CH%"=="2" goto :phone
 
 rem ---- make the WebM (kept in work-temp, so a second phone does not need it made again)
@@ -62,7 +63,10 @@ if errorlevel 1 (
     goto :end
 )
 echo  Converting it to WebM. This takes a minute or two ...
-"%FF%" -hide_banner -loglevel error -y -i "%WORK%\intro-original.mp4" -c:v libvpx -b:v 3M -deadline good -cpu-used 1 -auto-alt-ref 1 -c:a libvorbis -q:a 4 "%WORK%\intro-new.webm"
+rem Tapping skips the video by jumping to 0.1 s before its end and letting it play out to the last
+rem frame. A WebM can only jump to a keyframe, so: a keyframe every 2 s like the original, and every
+rem frame from 9.4 s on (the video is 9.72 s long) is one, so the jump lands right before the end.
+"%FF%" -hide_banner -loglevel error -y -i "%WORK%\intro-original.mp4" -c:v libvpx -b:v 3M -deadline good -cpu-used 1 -auto-alt-ref 1 -g 50 -force_key_frames "expr:gte(t,n_forced*2)+gte(t,9.4)" -c:a libvorbis -q:a 4 "%WORK%\intro-new.webm"
 if errorlevel 1 (
     echo  ffmpeg could not convert the video ^(the lines above say why^).
     del "%WORK%\intro-new.webm" 2>nul

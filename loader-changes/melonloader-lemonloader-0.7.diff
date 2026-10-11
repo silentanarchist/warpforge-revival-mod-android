@@ -411,10 +411,10 @@ index 75afae3c..8af07e81 100644
  #endif
 \ No newline at end of file
 diff --git a/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/Il2CppHandler.cs b/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/Il2CppHandler.cs
-index 4bd697fc..34169deb 100644
+index 4bd697fc..d3b616f8 100644
 --- a/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/Il2CppHandler.cs
 +++ b/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/Il2CppHandler.cs
-@@ -59,8 +59,64 @@ internal static class Il2CppHandler
+@@ -59,8 +59,69 @@ internal static class Il2CppHandler
          return domain;
      }
  
@@ -425,7 +425,7 @@ index 4bd697fc..34169deb 100644
 +    // Warpforge Revival change: settings for the loader's .NET memory, read before the runtime starts.
 +    // On a Pixel 6 Pro the runtime crashed now and then while allocating during start-up. The settings
 +    // come from UserData/runtime-gc.txt, which the mod writes, so a new setting can be tried with a
-+    // mod update instead of patching the game again; it takes effect at the next start. Only two
++    // mod update instead of patching the game again; it takes effect at the next start. Only three
 +    // runtime variables are read from it (MONO_GC_PARAMS and MONO_GC_DEBUG), each line
 +    // "NAME=value" with a short plain value; anything else in the file is ignored. Without the
 +    // file the first memory area ("nursery") is made 64 MB instead of 4 MB, so the runtime has to
@@ -450,7 +450,12 @@ index 4bd697fc..34169deb 100644
 +                    int eq = line.IndexOf('=');
 +                    if (line.Length == 0 || line.StartsWith('#') || eq <= 0) continue;
 +                    string name = line.Substring(0, eq).Trim(), value = line.Substring(eq + 1).Trim();
-+                    if ((name == "MONO_GC_PARAMS" || name == "MONO_GC_DEBUG") && SafeValue.IsMatch(value)) wanted[name] = value;
++                    // MONO_THREADS_SUSPEND: how the runtime stops threads for its garbage collector. On Android it
++                    // uses the signals SIGPWR and SIGXCPU for that, the same two the game's own collector uses;
++                    // "coop" makes it use none (threads stop at safe points instead), which ends that clash.
++                    bool known = name == "MONO_GC_PARAMS" || name == "MONO_GC_DEBUG" ||
++                                 (name == "MONO_THREADS_SUSPEND" && (value == "coop" || value == "hybrid" || value == "preemptive"));
++                    if (known && SafeValue.IsMatch(value)) wanted[name] = value;
 +                    else Core.Logger.Msg($"Runtime memory settings: ignored line '{line}'");
 +                }
 +            }
@@ -479,7 +484,7 @@ index 4bd697fc..34169deb 100644
          var managedDir = Path.Combine(LoaderConfig.Current.Loader.BaseDirectory, "MelonLoader", DOTNET_VERSION);
          var runtimeConfigPath = Path.Combine(managedDir, "MelonLoader.runtimeconfig.json");
          var nativeHostPath = Path.Combine(managedDir, "MelonLoader.NativeHost.dll");
-@@ -189,6 +245,13 @@ internal static class Il2CppHandler
+@@ -189,6 +250,13 @@ internal static class Il2CppHandler
          mono.SetThreadChecker(MonoCheckThread);
  
          MelonDebug.Log("Installed thread checker");
@@ -493,7 +498,7 @@ index 4bd697fc..34169deb 100644
      }
  
      private static void MonoUnhandledExceptionHandler(IntPtr exc, IntPtr userData)
-@@ -201,6 +264,11 @@ internal static class Il2CppHandler
+@@ -201,6 +269,11 @@ internal static class Il2CppHandler
  
      private static bool MonoCheckThread(ulong threadId)
      {

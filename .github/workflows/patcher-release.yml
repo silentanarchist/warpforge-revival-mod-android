@@ -1,0 +1,83 @@
+# Publishes a Release for the Warpforge Patcher app (the Android app that patches the game on the phone).
+# Committing releases/patcher/WarpforgePatcher-<version>.apk to main is all it takes: this creates the tag
+# patcher-v<version> and a Release named "Warpforge Patcher <version>" with that APK attached, its notes being
+# the install steps and the version's section of releases/patcher/CHANGELOG.md. Builds that already have a
+# Release are left alone. Only the current build is kept in releases/patcher/.
+#
+# These Releases are never marked "Latest", so the mod's own "latest release" links keep pointing at the mod.
+# A version whose CHANGELOG.md heading ends in "(test build)" is published as a pre-release.
+# The app's source is the WarpforgePatcher folder of https://github.com/silentanarchist/MelonLoaderInstaller
+# (branch warpforge-revival); the APK is built and signed with the app's private key on the owner's side.
+# Each new Release is posted to Discord like the mod's (secret DISCORD_WEBHOOK_URL), unless it is a pre-release.
+name: Patcher release
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "releases/patcher/*.apk"
+      - ".github/workflows/patcher-release.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create missing releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          shopt -s nullglob
+          changelog_section() {
+            awk -v v="$1" '/^## /{ if (found) exit; if (index($0, "## " v " ") == 1 || $0 == "## " v) { found = 1; next } } found' releases/patcher/CHANGELOG.md
+          }
+          for apk in releases/patcher/WarpforgePatcher-*.apk; do
+            version="$(basename "$apk" .apk)"
+            version="${version#WarpforgePatcher-}"
+            tag="patcher-v${version}"
+            if gh release view "$tag" >/dev/null 2>&1; then
+              echo "$tag already published"
+              continue
+            fi
+            pre=""
+            if grep -E "^## ${version//./\\.}( |$).*\(test build\)" releases/patcher/CHANGELOG.md >/dev/null; then pre="--prerelease"; fi
+            sha="$(sha256sum "$apk" | cut -c1-64)"
+            {
+              echo "**Warpforge Patcher** puts the mod loader and the Warpforge Revival mod into your own copy of the Android game (version 1.35.0), on the phone itself. No PC patching, no cable."
+              echo
+              echo "> [!WARNING]"
+              echo "> If the game is already on your phone, the app has to remove it first. **That erases the game's downloaded files, and they cannot be downloaded again.** Copy \`Android/data/com.Everguild.WarhammerWarpforge/files\` off the phone with a PC before you patch (on Android 12 and older the app can export them itself)."
+              echo
+              echo "**Install**"
+              echo "1. Download \`$(basename "$apk")\` below on the phone and open it. Allow installing apps from your browser when Android asks."
+              echo "2. Open **Warpforge Patcher**, allow the two permissions it asks for, and press **Patch and install**."
+              echo "3. Start the game. The full guide is in the README of this repository."
+              echo
+              echo "Needs Android 8 or newer and about 2 GB free while patching. The app downloads the loader from this repository and the mod from the revival server, and checks both."
+              echo
+              echo "SHA-256 of the APK: \`$sha\`"
+              echo
+              echo "Source: the \`WarpforgePatcher\` folder of [silentanarchist/MelonLoaderInstaller](https://github.com/silentanarchist/MelonLoaderInstaller/tree/warpforge-revival/WarpforgePatcher) (GPL-3.0)."
+            } > notes.md
+            section="$(changelog_section "$version" | sed 's/^### /#### /')"
+            if [ -n "$(printf '%s' "$section" | tr -d '[:space:]')" ]; then
+              { echo; echo "## What's new"; echo; printf '%s\n' "$section"; } >> notes.md
+            fi
+            gh release create "$tag" "$apk" --target "$GITHUB_SHA" --title "Warpforge Patcher ${version}" --notes-file notes.md --latest=false $pre
+            echo "published $tag ${pre:+(pre-release)}"
+            if [ -n "$DISCORD_WEBHOOK_URL" ] && [ -z "$pre" ]; then
+              body="$(printf '%s' "$section" | sed -E 's/^#### +(.*)$/**\1**/')"
+              [ -z "$(printf '%s' "$body" | tr -d '[:space:]')" ] && body="See the release page."
+              jq -n --arg title "Warpforge Patcher $version" --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/releases/tag/$tag" --arg body "$body" \
+                '{ allowed_mentions: { parse: [] }, embeds: [ { title: $title, url: $url, description: $body[0:3900] } ] }' > discord.json
+              url="$(printf '%s' "$DISCORD_WEBHOOK_URL" | tr -d '[:space:]')"; url="${url%/}"; url="${url%/github}"
+              code="$(curl -sS -o /dev/null -w '%{http_code}' -H "Content-Type: application/json" -d @discord.json "$url" || true)"
+              [ "${code:0:1}" = "2" ] && echo "posted $tag to Discord" || echo "::warning::could not post $tag to Discord (answer $code)"
+            fi
+          done

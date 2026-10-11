@@ -4,13 +4,14 @@ cd /d "%~dp0"
 title Warpforge for Android - fix the loading video
 
 echo.
-echo  Warpforge for Android - optional fix for black screens after the loading video
+echo  Warpforge for Android - optional fix for a badly played opening video
 echo  ------------------------------------------------------------------------------
 echo.
-echo  Only for phones that go black after the opening video (seen on the Pixel 6 Pro).
-echo  It copies the game's own opening video out of the game file, converts it to a
-echo  format the phone decodes differently (WebM), and puts it on the phone. The mod
-echo  then plays that copy instead. The game itself is not changed; option 2 undoes it.
+echo  Only for phones where the opening video plays badly: blocky, discoloured, stuttering
+echo  (seen on the Pixel 6 Pro). Its H.264 decoder does a poor job of the game's clip.
+echo  This copies the clip out of the game file, converts it to WebM, which the phone
+echo  decodes differently, and puts it on the phone. The mod then plays that copy.
+echo  Looks only: it changes nothing else. The game itself is not changed; option 2 undoes it.
 echo.
 echo    1 = make the video and put it on the phone
 echo    2 = remove it from the phone again

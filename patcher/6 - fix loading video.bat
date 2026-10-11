@@ -11,7 +11,7 @@ echo  Two things for phones that have trouble with the opening video:
 echo   - a WebM copy of the clip, for phones whose H.264 decoder plays it blocky, discoloured
 echo     or stuttering (seen on the Pixel 6 Pro); the mod plays that copy instead.
 echo   - the clip's last frame as a picture, for the mod's "Still" loading-video setting (set
-echo     with "8 - loading video setting.bat"): no video is decoded at all - on the Pixel 6 Pro
+echo     with "7 - loading video setting.bat"): no video is decoded at all - on the Pixel 6 Pro
 echo     decoding it leaves the menu black about 1 start in 5 - and the loading screen shows
 echo     that picture instead.
 echo  Both are made from your own game file with ffmpeg and copied to the phone. The game
@@ -119,7 +119,7 @@ set "C=/sdcard/MelonLoader/com.Everguild.WarhammerWarpforge/UserData/WarpforgeRe
 if "%CH%"=="2" (
     "%ADB%" -s !DEV! shell rm -f !C!/intro.webm !C!/intro-last.rgba
     echo  Removed. The game plays its original video again from the next start ^(unless the
-    echo  loading-video setting is Still or Off; "8 - loading video setting.bat" sets it back^).
+    echo  loading-video setting is Still or Off; "7 - loading video setting.bat" sets it back^).
     goto :end
 )
 

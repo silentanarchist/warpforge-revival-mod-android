@@ -11,7 +11,7 @@ echo  Changes the LoadingVideo setting in the mod's settings file on the phone
 echo  (UserData\WarpforgeRevival.cfg). Takes effect on the next start of the game.
 echo.
 echo    1 = Still    no video is decoded; the clip's last frame is shown as a picture instead
-echo                 (needs "7 - fix loading video.bat" run once). The fix for phones whose
+echo                 (needs "6 - fix loading video.bat" run once). The fix for phones whose
 echo                 video decoder leaves the menu black, like the Pixel 6 Pro.
 echo    2 = Normal   the game's own player (the usual setting)
 echo    3 = Off      no video, dark loading screen (test only)

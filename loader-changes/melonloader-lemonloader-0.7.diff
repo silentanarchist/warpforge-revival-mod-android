@@ -190,6 +190,79 @@ index be422c61..c7bdb8db 100644
          DotnetDir = Path.Combine(dotnetFolder);
      }
  }
+diff --git a/MelonLoader.Bootstrap/Proxy/Android/StdRedirect.cs b/MelonLoader.Bootstrap/Proxy/Android/StdRedirect.cs
+index ea956fb0..7a44326b 100644
+--- a/MelonLoader.Bootstrap/Proxy/Android/StdRedirect.cs
++++ b/MelonLoader.Bootstrap/Proxy/Android/StdRedirect.cs
+@@ -4,6 +4,54 @@ using System.Text;
+ 
+ namespace MelonLoader.Bootstrap.Proxy.Android;
+ 
++/// <summary>
++/// Warpforge Revival change. When the runtime hits a native crash it prints a crash report and should then
++/// pass the crash on to Android. On a Pixel 6 Pro the report itself kept crashing and starting over, for
++/// minutes: the game froze on its loading screen and the phone's log filled with hundreds of megabytes of
++/// the same report. Now the first crash line starts a short timer; the report gets a few seconds to be
++/// written (it says where the crash happened), only the first part of it is kept, and then the game is
++/// closed. A closed game can simply be started again.
++/// </summary>
++internal static class CrashWatch
++{
++    [DllImport("libc.so")] private static extern int getpid();
++    [DllImport("libc.so")] private static extern int kill(int pid, int sig);
++    [DllImport("liblog.so")] private static extern int __android_log_write(int prio, string tag, string text);
++
++    private const int SIGKILL = 9;
++    private const int KeepLines = 400;
++    private const int CloseAfterMs = 4000;
++    private static int crashed, lines;
++
++    private static readonly string[] Markers =
++    {
++        "Got a SIGSEGV", "Got a SIGBUS", "Got a SIGILL", "Got a SIGFPE", "Got a SIGABRT",
++        "a fatal error in the mono runtime", "* Assertion:",
++    };
++
++    /// <summary>True when the line should still go to the log.</summary>
++    public static bool Line(string text)
++    {
++        if (Volatile.Read(ref crashed) != 0)
++            return Interlocked.Increment(ref lines) <= KeepLines;
++        foreach (var m in Markers)
++        {
++            if (!text.Contains(m, StringComparison.Ordinal)) continue;
++            if (Interlocked.Exchange(ref crashed, 1) != 0) break;
++            __android_log_write(6, "MelonLoader", "[crash watch] the loader's .NET crashed (" + m.Trim('*', ' ', ':') + "); the game will be closed in a few seconds");
++            var closer = new Thread(() =>
++            {
++                Thread.Sleep(CloseAfterMs);
++                __android_log_write(6, "MelonLoader", $"[crash watch] closing the game now ({Volatile.Read(ref lines)} crash report lines, the first {KeepLines} kept)");
++                kill(getpid(), SIGKILL);
++            }) { IsBackground = true };
++            closer.Start();
++            break;
++        }
++        return true;
++    }
++}
++
+ internal static class StdRedirect
+ {
+     private const int STDERR_FILENO = 2;
+@@ -61,8 +109,11 @@ internal static class StdRedirect
+                 if (result == IntPtr.Zero)
+                     break;
+ 
+-                string logMsg = Encoding.UTF8.GetString(buffer).TrimEnd('\0', '\n', '\r');
+-                __android_log_write(3, tag, logMsg); // debug
++                // only up to the line's end: the buffer still holds the rest of any longer line before it
++                int len = Array.IndexOf(buffer, (byte)0);
++                string logMsg = Encoding.UTF8.GetString(buffer, 0, len < 0 ? buffer.Length : len).TrimEnd('\n', '\r');
++                if (CrashWatch.Line(logMsg))
++                    __android_log_write(3, tag, logMsg); // debug
+             }
+         });
+ 
 diff --git a/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/ClrMonoLib.cs b/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/ClrMonoLib.cs
 index 75afae3c..8af07e81 100644
 --- a/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/ClrMonoLib.cs
@@ -228,10 +301,45 @@ index 75afae3c..8af07e81 100644
  #endif
 \ No newline at end of file
 diff --git a/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/Il2CppHandler.cs b/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/Il2CppHandler.cs
-index 4bd697fc..03cb740a 100644
+index 4bd697fc..50191ddc 100644
 --- a/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/Il2CppHandler.cs
 +++ b/MelonLoader.Bootstrap/RuntimeHandlers/Il2Cpp/Il2CppHandler.cs
-@@ -189,6 +189,13 @@ internal static class Il2CppHandler
+@@ -59,8 +59,34 @@ internal static class Il2CppHandler
+         return domain;
+     }
+ 
++#if ANDROID
++    [DllImport("libc.so", EntryPoint = "setenv")]
++    private static extern int SetEnv(string name, string value, int overwrite);
++
++    // Warpforge Revival change: a larger first area ("nursery") for the loader's .NET memory, so it has
++    // to clean up far less often while the mod starts. On a Pixel 6 Pro the runtime crashed while
++    // allocating during start-up; every clean-up stops all threads with signals that the game's own
++    // garbage collector also uses, so fewer clean-ups means fewer chances to collide. The default
++    // nursery is 4 MB; 64 MB is small next to a phone's memory. An already set value is kept.
++    private const string GcParams = "nursery-size=64m";
++
++    private static void SetRuntimeMemory()
++    {
++        try
++        {
++            string? had = Environment.GetEnvironmentVariable("MONO_GC_PARAMS");
++            if (string.IsNullOrEmpty(had)) SetEnv("MONO_GC_PARAMS", GcParams, 0);
++            Core.Logger.Msg($"Runtime memory settings: {(string.IsNullOrEmpty(had) ? GcParams : had + " (already set)")}");
++        }
++        catch (Exception e) { Core.Logger.Error("Could not set the runtime memory settings: " + e.Message); }
++    }
++#endif
++
+     private static void InitializeManaged()
+     {
++#if ANDROID
++        SetRuntimeMemory();
++#endif
+         var managedDir = Path.Combine(LoaderConfig.Current.Loader.BaseDirectory, "MelonLoader", DOTNET_VERSION);
+         var runtimeConfigPath = Path.Combine(managedDir, "MelonLoader.runtimeconfig.json");
+         var nativeHostPath = Path.Combine(managedDir, "MelonLoader.NativeHost.dll");
+@@ -189,6 +215,13 @@ internal static class Il2CppHandler
          mono.SetThreadChecker(MonoCheckThread);
  
          MelonDebug.Log("Installed thread checker");
@@ -245,7 +353,7 @@ index 4bd697fc..03cb740a 100644
      }
  
      private static void MonoUnhandledExceptionHandler(IntPtr exc, IntPtr userData)
-@@ -201,6 +208,11 @@ internal static class Il2CppHandler
+@@ -201,6 +234,11 @@ internal static class Il2CppHandler
  
      private static bool MonoCheckThread(ulong threadId)
      {

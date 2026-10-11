@@ -18,7 +18,7 @@ Changes made on the server take effect for everyone at once; the ones listed her
 - **Phones: smoother loading screen**: the mod no longer searches the whole screen for the Testers window four times a second while there is none (not yet confirmed).
 - **Phones: fewer crashes and freezes while loading** (seen on a Pixel 6 Pro): the mod now sets itself up with the game's memory clean-up paused for those few seconds (not yet confirmed).
 - **Phones: a crash no longer freezes the game on its loading screen** (needs the game patched again with "1 - patch.bat"): when the loader crashes, the game now closes after a few seconds instead of hanging and filling the phone's log; the loader's .NET also cleans up its memory less often while starting (not yet confirmed).
-- **Phones: black screen once the menu loads** (seen on a Pixel 6 Pro; music plays, picture stays black until the phone is locked and unlocked): the mod now notices a black picture and wakes the drawing up by itself (not yet confirmed).
+- **Phones: black screen once the menu loads** (seen on a Pixel 6 Pro; music plays, picture stays black until the phone is locked and unlocked): the mod now notices a black picture, works out which part of the game's drawing setup is behind it, and brings the picture back by itself (not yet confirmed).
 - **Phones: start-up that could not load the mod properly** (seen on a Pixel 6 Pro, about one start in several): instead of a black loading screen that never ends, the game now says to close it fully and open it again.
 
 ## 0.12.34-a - 2026-10-10

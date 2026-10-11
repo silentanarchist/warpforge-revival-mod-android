@@ -76,6 +76,14 @@ Android/data/com.Everguild.WarhammerWarpforge/files
 Those files are no longer downloadable from anywhere. Do not patch a phone that may hold a newer
 set of them than you have saved.
 
+**Do not uninstall the game yourself until the patch is done.**
+The original game has to come off the phone at some point, but only at the very end: after you have
+made your backup of the app (the `.apks` / `.xapk` file) and copied the `files` folder to the PC
+(both above), after `1 - patch.bat` has unpacked that backup and finished, and after you have
+checked that the `patched` folder holds its three files. Uninstalling earlier can leave you with
+no copy of the game to patch. With a cable, `2 - install on phone.bat` does the removal for you at
+the right moment (step 6). Without one, see step 6 as well.
+
 **Keep your signing key.**
 The first time you patch, the patcher makes a signing key and saves it as
 `patcher\tool\signing-key.pem`. Every later patch you install has to be signed with that same
@@ -144,7 +152,10 @@ Double-click **`2 - install on phone.bat`**.
   ahead if you type `YES`.
 
 No cable? Copy the three files from `patched` to the phone and install them *together* with a
-split-APK installer app such as SAI. Tapping `base.apk` on its own does not work.
+split-APK installer app such as SAI. Tapping `base.apk` on its own does not work. Android refuses
+the install while the original game is still on the phone, so uninstall it yourself (hold the
+game's icon > **Uninstall**) **only now**: after your backups are on the PC, `1 - patch.bat` has
+finished and the three files are on the phone. Then install them.
 
 ### 7. First start
 

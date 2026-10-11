@@ -77,8 +77,13 @@ jobs:
               { echo; echo "## What's new"; echo; printf '%s\n' "$section"; } >> notes.md
             fi
             if gh release view "$tag" >/dev/null 2>&1; then
-              gh release edit "$tag" --notes-file notes.md
-              echo "$tag: notes put back"
+              if gh release view "$tag" --json assets --jq '.assets[].name' | grep -qx "$srczip"; then
+                echo "$tag already published with its source"
+              else
+                gh release upload "$tag" "$srczip"
+                gh release edit "$tag" --notes-file notes.md
+                echo "$tag: source zip added and notes rewritten"
+              fi
               continue
             fi
             gh release create "$tag" "$apk" "$srczip" --target "$GITHUB_SHA" --title "Warpforge Patcher ${version}" --notes-file notes.md --latest=false $pre

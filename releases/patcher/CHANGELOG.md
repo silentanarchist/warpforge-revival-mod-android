@@ -3,6 +3,14 @@
 The Android app that patches the game on the phone itself. Newest first. A heading ending in
 "(test build)" is published as a pre-release.
 
+## 0.2.1 - 2026-10-11
+
+### Changes
+- The "Export the game's downloaded files" button is gone. The revival server hands those files out now, so they no longer need backing up.
+- Before it removes the installed game, the app asks a plain "Remove the game first?" (Continue or Stop) and no longer asks about a backup.
+
+Tested on a phone.
+
 ## 0.2.0 - 2026-10-11
 
 ### New

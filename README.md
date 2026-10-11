@@ -325,12 +325,19 @@ branch of this project's forks,
 
 `melonloader-lemonloader-0.7.diff` (against LemonLoader/MelonLoader `7b14dac3`)
 
-- A native crash is handed on to the system instead of hanging the app.
+- A native crash is handed on to the system instead of hanging the app: a small C handler
+  (`faultprobe.c` in the diff) looks at every memory fault first, passes the ones in managed
+  code on to the runtime, and for a fault in native code logs the address and the memory
+  mappings around it, then lets Android write its full crash report. The crash watch that
+  closes the game when the runtime's own report loops stays as a fallback.
+- The runtime's memory settings (nursery size, how threads are stopped for the collector) are
+  read from `UserData/runtime-gc.txt`, written by the mod.
 - The loader's files are copied out of the app once per patch, not on every start (this was 30
   to 40 seconds of black screen each time).
 - The game's name and versions are read from a small text file instead of the 700 MB data file.
 - The short (4-byte) kind of hook is used only for functions too short for a normal one. Using
-  it everywhere made the game fail at random on start.
+  it everywhere made the game fail at random on start. A jump that lands within the function's
+  own first 16 bytes (compiler padding) no longer counts as "too short".
 - The interface files are taken ready-made from the package (see [The loader package](#the-loader-package)),
   because the tools that generate them do not run on a phone.
 

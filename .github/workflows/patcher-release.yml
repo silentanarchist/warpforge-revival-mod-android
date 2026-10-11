@@ -10,7 +10,8 @@
 # https://github.com/silentanarchist/MelonLoaderInstaller. releases/patcher/SOURCE-COMMIT names the exact commit the
 # current APK was built from: the notes link to that commit (not the branch, which moves on), and its source zip is
 # attached to the Release as WarpforgePatcher-<version>-source.zip (GPL-3.0: the source travels with the build).
-# A Release that already exists but lacks that zip gets it added and its notes rewritten.
+# A Release that already exists gets that zip added if it lacks it, and its notes rewritten when they differ from
+# this template (so changing the template here updates the current Release).
 # The APK is built and signed with the app's private key on the owner's side.
 # Each new Release is posted to Discord like the mod's (secret DISCORD_WEBHOOK_URL), unless it is a pre-release.
 name: Patcher release
@@ -58,12 +59,10 @@ jobs:
             {
               echo "**Warpforge Patcher** puts the mod loader and the Warpforge Revival mod into your own copy of the Android game (version 1.35.0), on the phone itself. No PC patching, no cable."
               echo
-              echo "> [!WARNING]"
-              echo "> If the game is already on your phone, the app has to remove it first. **That erases the game's downloaded files, and they cannot be downloaded again.** Copy \`Android/data/com.Everguild.WarhammerWarpforge/files\` off the phone with a PC before you patch (on Android 12 and older the app can export them itself)."
-              echo
               echo "**Install**"
               echo "1. Download \`$(basename "$apk")\` below on the phone and open it. Allow installing apps from your browser when Android asks."
-              echo "2. Open **Warpforge Patcher**, allow the two permissions it asks for, and press **Patch and install**."
+              echo "2. Open **Warpforge Patcher**, allow the two permissions it asks for, and press **Patch and install**: it patches the game on the phone, installs it and puts the current mod in place."
+              echo "   **Update the mod only** puts the current mod in place without touching the game."
               echo "3. Start the game. The full guide is in the README of this repository."
               echo
               echo "Needs Android 8 or newer and about 2 GB free while patching. The app downloads the loader from this repository and the mod from the revival server, and checks both."
@@ -77,12 +76,16 @@ jobs:
               { echo; echo "## What's new"; echo; printf '%s\n' "$section"; } >> notes.md
             fi
             if gh release view "$tag" >/dev/null 2>&1; then
-              if gh release view "$tag" --json assets --jq '.assets[].name' | grep -qx "$srczip"; then
-                echo "$tag already published with its source"
-              else
+              if ! gh release view "$tag" --json assets --jq '.assets[].name' | grep -qx "$srczip"; then
                 gh release upload "$tag" "$srczip"
+                echo "$tag: source zip added"
+              fi
+              # the notes follow this template: a release whose notes differ (an older template) is rewritten
+              if [ "$(gh release view "$tag" --json body --jq .body | sed -e 's/[[:space:]]*$//')" != "$(sed -e 's/[[:space:]]*$//' notes.md)" ]; then
                 gh release edit "$tag" --notes-file notes.md
-                echo "$tag: source zip added and notes rewritten"
+                echo "$tag: notes rewritten"
+              else
+                echo "$tag already published, notes current"
               fi
               continue
             fi

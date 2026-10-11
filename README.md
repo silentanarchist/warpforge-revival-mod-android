@@ -1,21 +1,5 @@
 # Warpforge Revival for Android
 
-> ## ⚠️ Back up your game files first, before anything else
->
-> **Installing this erases the game's downloaded files from your phone, and they cannot be
-> downloaded again from anywhere.**
->
-> Before you download, patch or install anything, connect the phone to a PC and copy this folder
-> off the phone:
->
-> ```
-> Android/data/com.Everguild.WarhammerWarpforge/files
-> ```
->
-> Check that the copy finished and the folder on the PC is not empty. Only then carry on. If your
-> phone might hold a newer set of these files than you have saved, do not patch it until you have
-> copied them. Details are under [Before you start](#before-you-start).
-
 Everything needed to run *Warhammer 40,000: Warpforge* on an Android phone against a
 [Warpforge Revival server](https://github.com/silentanarchist/warpforge-revival-server), now that
 the game's own servers are closed:
@@ -48,13 +32,14 @@ edges. Read the code before you rely on it, and please report what you find.
 
 The **Warpforge Patcher** app does everything the PC scripts below do, on the phone itself: it patches your own copy of the game, installs it and puts the mod in place. No PC patching, no cable, no adb. It uses the same patching code as `patcher\1 - patch.bat`. Its source is the `WarpforgePatcher` folder of [this project's LemonLoader installer fork](https://github.com/silentanarchist/MelonLoaderInstaller/tree/warpforge-revival/WarpforgePatcher) (GPL-3.0).
 
-> [!WARNING]
-> If the game is already on your phone, the app has to remove it first. **That erases the game's downloaded files, and they cannot be downloaded again.** Copy `Android/data/com.Everguild.WarhammerWarpforge/files` off the phone with a PC before you patch. On Android 12 and older the app's **Export the game's downloaded files** button can make the copy instead; Android 13 and newer only allow it from a PC.
-
 1. Download `WarpforgePatcher-<version>.apk` from the **Warpforge Patcher** release on the [releases page](https://github.com/silentanarchist/warpforge-revival-mod-android/releases) and open it on the phone. Allow installing apps from your browser when Android asks.
 2. Open **Warpforge Patcher** and allow the two permissions it asks for: all files access (for the loader's folder) and installing apps.
-3. Press **Patch and install** (or **Patch from a backup file** for a `.apks` / `.xapk` backup). Confirm the backup question and Android's two prompts. The data file takes a few minutes.
+3. Press **Patch and install** (or **Patch from a backup file** for a `.apks` / `.xapk` backup). Confirm Android's prompts (removing the old game if the app has to, then installing the patched one). The data file takes a few minutes.
 4. Start the game, allow "All files access" if it asks, and sign in.
+
+**The two main buttons**
+- **Patch and install** (**Patch again and install** once the game is patched): puts the mod loader into the game on this phone, installs the patched game and puts the current mod in place. Use it the first time, and again whenever a new loader comes out. Patched by this app before, it installs over the game and keeps everything.
+- **Update the mod only**: downloads the current mod from the server and puts it in place, without touching the game. Use it when the game stops at the title screen with a connection error, or to get a new mod straight away. The mod also updates itself when the game starts.
 
 **Fix black menu after loading** (ticked by default on Pixel 6 and later, and on Samsungs with an Exynos chip and Mali graphics) shows a still picture on the loading screen instead of the opening video, which can leave the menu black on those phones.
 
@@ -68,8 +53,7 @@ The rest of this page is the PC route: the scripts in `patcher/`, run from a Win
 
 ## Before you start
 
-Read this part first. Two of these points cost people their data if skipped. The first is the
-backup at the top of this page: do that now if you have not.
+Read this part first.
 
 **What you need**
 
@@ -84,22 +68,9 @@ backup at the top of this page: do that now if you have not.
 - Google's "SDK Platform-Tools for Windows" (the `adb` program), from
   <https://developer.android.com/tools/releases/platform-tools>.
 
-**Installing erases the game's downloaded files on the phone.**
-Android will not install a patched game over the original one, so the original has to be removed
-first, and removing it deletes everything the game downloaded. If your phone still holds the
-game's card files from before the shutdown, copy this folder to a PC *before you do anything else*:
-
-```
-Android/data/com.Everguild.WarhammerWarpforge/files
-```
-
-Those files are no longer downloadable from anywhere. Do not patch a phone that may hold a newer
-set of them than you have saved.
-
 **Do not uninstall the game yourself until the patch is done.**
 The original game has to come off the phone at some point, but only at the very end: after you have
-made your backup of the app (the `.apks` / `.xapk` file) and copied the `files` folder to the PC
-(both above), after `1 - patch.bat` has unpacked that backup and finished, and after you have
+made your backup of the app (the `.apks` / `.xapk` file, above), after `1 - patch.bat` has unpacked that backup and finished, and after you have
 checked that the `patched` folder holds its three files. Uninstalling earlier can leave you with
 no copy of the game to patch. With a cable, `2 - install on phone.bat` does the removal for you at
 the right moment (step 6). Without one, see step 6 as well.
@@ -168,13 +139,13 @@ Double-click **`2 - install on phone.bat`**.
 - If the game on the phone was patched before with the same signing key, the new copy installs
   over it and nothing is lost.
 - Otherwise the install is refused, and the script asks whether to remove the copy on the phone
-  first. **That is the step that erases the game's downloaded files** (see above). It only goes
-  ahead if you type `YES`.
+  first. That removes the game's downloaded files too; the server hands them out again. It only
+  goes ahead if you type `YES`.
 
 No cable? Copy the three files from `patched` to the phone and install them *together* with a
 split-APK installer app such as SAI. Tapping `base.apk` on its own does not work. Android refuses
 the install while the original game is still on the phone, so uninstall it yourself (hold the
-game's icon > **Uninstall**) **only now**: after your backups are on the PC, `1 - patch.bat` has
+game's icon > **Uninstall**) **only now**: after your backup of the app is on the PC, `1 - patch.bat` has
 finished and the three files are on the phone. Then install them.
 
 ### 7. First start

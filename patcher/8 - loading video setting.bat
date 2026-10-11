@@ -10,15 +10,18 @@ echo.
 echo  Changes the LoadingVideo setting in the mod's settings file on the phone
 echo  (UserData\WarpforgeRevival.cfg). Takes effect on the next start of the game.
 echo.
-echo    1 = Off      the video is stopped as it starts; the loading screen stays dark
-echo                 (the test: does the black menu still happen without the video?)
-echo    2 = Texture  the video is drawn through a texture and a plain image, not the camera
-echo    3 = Normal   the game's own player (the usual setting)
+echo    1 = Still    no video is decoded; the clip's last frame is shown as a picture instead
+echo                 (needs "7 - fix loading video.bat" run once). The fix for phones whose
+echo                 video decoder leaves the menu black, like the Pixel 6 Pro.
+echo    2 = Normal   the game's own player (the usual setting)
+echo    3 = Off      no video, dark loading screen (test only)
+echo    4 = Texture  the video drawn through a texture (test only; did not help)
 echo.
-choice /c 123 /n /m "  Press 1, 2 or 3: "
-set "MODE=Off"
-if errorlevel 2 set "MODE=Texture"
-if errorlevel 3 set "MODE=Normal"
+choice /c 1234 /n /m "  Press 1, 2, 3 or 4: "
+set "MODE=Still"
+if errorlevel 2 set "MODE=Normal"
+if errorlevel 3 set "MODE=Off"
+if errorlevel 4 set "MODE=Texture"
 
 set "ADB="
 if exist "tool\platform-tools\adb.exe" set "ADB=%~dp0tool\platform-tools\adb.exe"

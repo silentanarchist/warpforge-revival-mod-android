@@ -20,6 +20,7 @@ patcher/phone-logs.zip
 patcher/uninstall-backup/
 patcher/tool/signing-key.pem
 patcher/tool/platform-tools/
+patcher/tool/ffmpeg/
 # joined on every run from the .part files
 patcher/tool/LemonPatch.exe
 patcher/tool/melon_data.zip

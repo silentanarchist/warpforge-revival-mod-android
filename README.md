@@ -261,7 +261,7 @@ contain your player id and server address, so do not post them publicly.
 | Black screen for up to a minute on the first start after installing | Wait. It is copying the loader's files; later starts skip it. |
 | The game stops at the title screen with a connection error | The mod is not on the phone (step 8), or the server is not reachable from the phone. |
 | The game closes a few seconds after you open it, right after an update | An older mod build's "Close game" left the app half-closed. Swipe it away from the recent apps and open it again. Fixed from 0.11.9-a. |
-| After signing in the screen flashes big coloured blocks and then stays black until the game is restarted (seen on a Pixel 6 Pro, with Vulkan and with OpenGL ES) | Not solved yet. Try the game's own **Settings > Graphics > Extended compatibility** option, then restart the game. If it still happens, leave the game on the black screen, run **`0 - get phone logs.bat`** while it is still running, and send the folder it makes. |
+| After the opening video (or after signing in) the screen stays black while the music plays (seen on a Pixel 6 Pro) | The phone's video decoder fails to shut down cleanly after the opening video. Since mod 0.12.46 the mod notices and fixes the screen itself after a second or two; locking and unlocking the phone also brings it back. To stop it happening: run **`7 - fix loading video.bat`** (option `1`) with the phone connected. It needs ffmpeg (the script says where to get it), copies the opening video out of your game file, converts it to WebM and puts it on the phone; the mod then plays that copy, which the phone decodes differently. Option `2` removes it again. If it still happens, leave the game on the black screen, run **`0 - get phone logs.bat`** while it is still running, and send the folder it makes. |
 | A start gets stuck before signing in, or closes within seconds, for no clear reason | Swipe the app away and start again. If it keeps happening, collect logs with option `2` before closing it. |
 
 ---
@@ -290,7 +290,8 @@ A server needs two things for phones, both described in the
 | `patcher/3 - put mod on phone.bat` | Copies the mod from `patcher\mods` to the phone. |
 | `patcher/4 - put game login on phone.bat` | Copies a game login file from the server's website to the phone. |
 | `patcher/5 - uninstall from phone.bat` | Removes the game, the loader and the mod from a phone (copies its settings file and logs to `patcher\uninstall-backup` first). Your account and progress stay on the server. |
-| `patcher/6 - graphics trace.bat` | Records about 90 seconds of what the phone does while the game starts (a Perfetto system trace: CPU and GPU speeds, which core ran what, every frame the screen showed, temperatures, memory) into `patcher\graphics-traces`, for chasing stutters and black screens. The trace settings are `patcher/tool/graphics-trace.cfg`. Changes nothing on the phone. |
+| `patcher/6 - graphics trace.bat` | Records what the phone does while the game starts, until you press a key (plus 10 seconds), up to 5 minutes (a Perfetto system trace: CPU and GPU speeds, which core ran what, every frame the screen showed, temperatures, memory) into `patcher\graphics-traces`, for chasing stutters and black screens. The trace settings are `patcher/tool/graphics-trace.cfg`. Changes nothing on the phone. |
+| `patcher/7 - fix loading video.bat` | Optional, for phones that go black after the opening video. Copies the opening video out of your game file (`patcher/tool/extract-intro.ps1`), converts it to WebM with ffmpeg (not included; put `ffmpeg.exe` in `patcher\tool\ffmpeg`) and puts it on the phone, where the mod plays it instead of the original. Option 2 removes it. The converted video stays in `patcher\work-temp` and is never published. |
 | `patcher/tool/LemonPatch.exe.part0`, `.part1` | The patching program, in two halves (joined on every run). |
 | `patcher/tool/melon_data.zip.part0` to `.part2` | The loader package, in three pieces (joined on every run). |
 | `patcher/LemonPatch-source.cs`, `LemonPatch.csproj`, `LemonPatch-core-change.diff` | Its source: a small command-line front end, and two changes to LemonLoader's installer code. |
@@ -374,7 +375,7 @@ code, as every MelonLoader installation does. That is Unity's engine code, not t
 
 **The game.** Not ours to publish. You supply your own copy, and the patcher only works on it.
 
-**Your signing key, your logs, and anything in `game-files`, `patched` or `phone-logs`.** They are
+**Your signing key, your logs, ffmpeg, and anything in `game-files`, `patched`, `work-temp` or `phone-logs`.** They are
 listed in `.gitignore` so they cannot be committed by accident.
 
 ---

@@ -44,6 +44,26 @@ edges. Read the code before you rely on it, and please report what you find.
 > untested; if it fails on yours, the logs (see [If something goes wrong](#if-something-goes-wrong))
 > are what is needed to find out why. 
 
+## Easiest: patch on the phone with the Warpforge Patcher app
+
+The **Warpforge Patcher** app does everything the PC scripts below do, on the phone itself: it patches your own copy of the game, installs it and puts the mod in place. No PC patching, no cable, no adb. It uses the same patching code as `patcher\1 - patch.bat`. Its source is the `WarpforgePatcher` folder of [this project's LemonLoader installer fork](https://github.com/silentanarchist/MelonLoaderInstaller/tree/warpforge-revival/WarpforgePatcher) (GPL-3.0).
+
+> [!WARNING]
+> If the game is already on your phone, the app has to remove it first. **That erases the game's downloaded files, and they cannot be downloaded again.** Copy `Android/data/com.Everguild.WarhammerWarpforge/files` off the phone with a PC before you patch. On Android 12 and older the app's **Export the game's downloaded files** button can make the copy instead; Android 13 and newer only allow it from a PC.
+
+1. Download `WarpforgePatcher-<version>.apk` from the **Warpforge Patcher** release on the [releases page](https://github.com/silentanarchist/warpforge-revival-mod-android/releases) and open it on the phone. Allow installing apps from your browser when Android asks.
+2. Open **Warpforge Patcher** and allow the two permissions it asks for: all files access (for the loader's folder) and installing apps.
+3. Press **Patch and install** (or **Patch from a backup file** for a `.apks` / `.xapk` backup). Confirm the backup question and Android's two prompts. The data file takes a few minutes.
+4. Start the game, allow "All files access" if it asks, and sign in.
+
+**Fix black menu after loading** (ticked by default on Pixel 6 and later, and on Samsungs with an Exynos chip and Mali graphics) shows a still picture on the loading screen instead of the opening video, which can leave the menu black on those phones.
+
+**Keep the app's signing key.** **Save a copy of the signing key** in the app and keep the file private. Later patches must use the same key, or the game has to be removed again. A game patched on a PC carries a different key, so moving between PC- and phone-patched needs one removal.
+
+Something wrong? **Share logs** in the app makes one zip with the app's log, `Latest.log` and the mod's settings (never the game login).
+
+The rest of this page is the PC route: the scripts in `patcher/`, run from a Windows PC with a cable.
+
 ---
 
 ## Before you start

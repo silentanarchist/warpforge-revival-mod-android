@@ -3,6 +3,16 @@
 The Android app that patches the game on the phone itself. Newest first. A heading ending in
 "(test build)" is published as a pre-release.
 
+## 0.2.3 - 2026-10-13
+
+### New
+- **The app updates itself.** When a newer Warpforge Patcher is released, a pop-up offers it when you open the app: **Update now** or **Later**. Updating downloads it, checks it and installs it over the old version. Your saved signing key is kept, so nothing needs redoing.
+- **Check for updates** button in the top right corner, to look for a new version at any time.
+- If you choose **Later**, an "Update this app" button stays under the status until you update.
+- Updates are only installed when they come from this project's GitHub releases, match the checksum in their release notes, and are signed with the same key as the app you have.
+
+Install this version once by hand. From now on, updates arrive through the app.
+
 ## 0.2.1 - 2026-10-11
 
 ### Changes

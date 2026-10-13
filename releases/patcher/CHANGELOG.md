@@ -3,6 +3,11 @@
 The Android app that patches the game on the phone itself. Newest first. A heading ending in
 "(test build)" is published as a pre-release.
 
+## 0.2.4 - 2026-10-13
+
+### New
+- **Save card art export to Downloads.** After exporting card art in the game (Settings > Mod > Export card art), this button copies the export to your phone's Download folder so it's easy to find. The app shows when the export was made and its size.
+
 ## 0.2.3 - 2026-10-13
 
 ### New

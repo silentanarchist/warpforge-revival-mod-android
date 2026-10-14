@@ -3,6 +3,14 @@
 The Android app that patches the game on the device itself. Write "device", not "phone", unless something only applies to phones. Newest first. A heading ending in
 "(test build)" is published as a pre-release.
 
+## 0.2.6 - 2026-10-14
+
+### New
+- **Server setting on the Tools page.** Shows which server the mod connects to and lets you change it, or switch back to the community server, without editing files. Close the game fully first; the change applies the next time it starts.
+
+### Changes
+- The app's text says "device" instead of "phone".
+
 ## 0.2.5 - 2026-10-14
 
 ### Fixed

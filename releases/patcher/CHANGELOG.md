@@ -3,6 +3,20 @@
 The Android app that patches the game on the phone itself. Newest first. A heading ending in
 "(test build)" is published as a pre-release.
 
+## 0.2.5 - 2026-10-14
+
+### Fixed
+- Tapping outside Android's install, removal or update confirmation could leave the app stuck. On devices where that happens, the button now reads "Continue: …" and brings the confirmation back.
+
+### New
+- **Tools page.** A menu under the title switches between **Patcher** and **Tools**. Tools holds:
+  - **The black screen fix.** Apply or remove it on an already patched game, without patching again.
+  - **Save card art export to Downloads.**
+  - **The signing key buttons.**
+
+### Changes
+- The log area at the bottom is half as tall.
+
 ## 0.2.4 - 2026-10-13
 
 ### New

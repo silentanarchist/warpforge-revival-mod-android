@@ -1,4 +1,5 @@
-# Publishes a Release for the Warpforge Patcher app (the Android app that patches the game on the phone).
+# Publishes a Release for the Warpforge Patcher app (the Android app that patches the game on the device itself).
+# Wording (owner's rule): release notes say "device", not "phone", unless something only applies to phones.
 # Committing releases/patcher/WarpforgePatcher-<version>.apk to main is all it takes: this creates the tag
 # patcher-v<version> and a Release named "Warpforge Patcher <version>" with that APK attached, its notes being
 # the install steps and the version's section of releases/patcher/CHANGELOG.md. Builds that already have a
@@ -56,13 +57,12 @@ jobs:
             if grep -E "^## ${version//./\\.}( |$).*\(test build\)" releases/patcher/CHANGELOG.md >/dev/null; then pre="--prerelease"; fi
             sha="$(sha256sum "$apk" | cut -c1-64)"
             {
-              echo "**Warpforge Patcher** puts the mod loader and the Warpforge Revival mod into your own copy of the Android game (version 1.35.0), on the phone itself. No PC patching, no cable."
+              echo "**Warpforge Patcher** puts the mod loader and the Warpforge Revival mod into your own copy of the Android game (version 1.35.0), on the device itself. No PC patching, no cable."
               echo
-              echo "> [!WARNING]"
-              echo "> If the game is already on your phone, the app has to remove it first. **That erases the game's downloaded files, and they cannot be downloaded again.** Copy \`Android/data/com.Everguild.WarhammerWarpforge/files\` off the phone with a PC before you patch (on Android 12 and older the app can export them itself)."
+              echo "If the game is already installed, the app removes it first (Android asks you to confirm), then installs the patched copy."
               echo
               echo "**Install**"
-              echo "1. Download \`$(basename "$apk")\` below on the phone and open it. Allow installing apps from your browser when Android asks."
+              echo "1. Download \`$(basename "$apk")\` below on the device and open it. Allow installing apps from your browser when Android asks."
               echo "2. Open **Warpforge Patcher**, allow the two permissions it asks for, and press **Patch and install**."
               echo "3. Start the game. The full guide is in the README of this repository."
               echo

@@ -1,6 +1,6 @@
 # Warpforge Patcher changelog
 
-The Android app that patches the game on the phone itself. Newest first. A heading ending in
+The Android app that patches the game on the device itself. Write "device", not "phone", unless something only applies to phones. Newest first. A heading ending in
 "(test build)" is published as a pre-release.
 
 ## 0.2.5 - 2026-10-14

@@ -3,6 +3,11 @@
 The Android app that patches the game on the device itself. Write "device", not "phone", unless something only applies to phones. Newest first. A heading ending in
 "(test build)" is published as a pre-release.
 
+## 0.2.7 - 2026-10-14
+
+### Changes
+- The community server is now `wf-revival.silentanarchist.com`, matching the mod. Settings that still name `warpforge.silentanarchist.com` keep working; it's the same server.
+
 ## 0.2.6 - 2026-10-14
 
 ### New

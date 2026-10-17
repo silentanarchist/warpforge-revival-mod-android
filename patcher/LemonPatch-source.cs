@@ -27,8 +27,8 @@ Console.WriteLine("Code file:   " + Path.GetFileName(lib));
 Console.WriteLine("Other files: " + (extra.Length == 0 ? "(none)" : string.Join(", ", extra.Select(Path.GetFileName))));
 if (extra.Length == 0) Console.WriteLine("WARNING: no data pack (UnityDataAssetPack.apk) found - the game will not start without it.");
 
-L.File = Path.Combine(Path.GetDirectoryName(outDir)!, "patch-log.txt");
-try { File.Delete(L.File); } catch { }
+L.LogFile = Path.Combine(Path.GetDirectoryName(outDir)!, "patch-log.txt");
+try { File.Delete(L.LogFile); } catch { }
 if (Directory.Exists(outDir)) Directory.Delete(outDir, true);
 Directory.CreateDirectory(outDir);
 string temp = Path.Combine(Path.GetDirectoryName(outDir)!, "work-temp");
@@ -59,10 +59,10 @@ return ok ? 0 : 1;
 
 class L : IPatchLogger
 {
-    public static string File = "";
+    public static string LogFile = "";
     public void Log(string m)
     {
         Console.WriteLine(m);
-        try { if (File.Length > 0) System.IO.File.AppendAllText(File, m + Environment.NewLine); } catch { }
+        try { if (LogFile.Length > 0) System.IO.File.AppendAllText(LogFile, m + Environment.NewLine); } catch { }
     }
 }

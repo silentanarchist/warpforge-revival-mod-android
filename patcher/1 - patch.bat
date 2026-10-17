@@ -88,7 +88,7 @@ echo  inside it into the "game-files" folder, then run this again.
 goto :end
 :noloader
 echo  The loader files are missing. The "tool" folder should contain
-echo  melon_data.zip.part0 and melon_data.zip.part1.
+echo  melon_data.zip.part0, melon_data.zip.part1 and melon_data.zip.part2.
 goto :end
 :failed
 echo.

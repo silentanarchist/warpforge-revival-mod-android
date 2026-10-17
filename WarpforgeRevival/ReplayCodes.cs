@@ -278,7 +278,7 @@ namespace WarpforgeRevival
                 {
                     var reply = await Net.PostJson("/playfab/Revival/ReplayCode",
                         JsonSerializer.Serialize(new Dictionary<string, string> { ["recordingIndex"] = index }),
-                        TimeSpan.FromSeconds(Math.Max(20, RevivalMod.Config.TimeoutSeconds)));
+                        TimeSpan.FromSeconds(Math.Max(20, RevivalMod.Config.TimeoutSeconds)), retry: true);     // the same code again: no harm
                     if (reply.Ok && reply.Data.ValueKind == JsonValueKind.Object && reply.Data.TryGetProperty("code", out var c)) code = c.GetString();
                     else error = reply.Unreachable ? "could not reach the server" : reply.Error;
                 }

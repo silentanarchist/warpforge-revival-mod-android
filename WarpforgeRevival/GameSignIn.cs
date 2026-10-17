@@ -144,9 +144,6 @@ namespace WarpforgeRevival
             }
         }
 
-        // Kept apart so that a game build missing Application.OpenURL fails inside OpenTerms' try, not in Draw.
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-
         private static string ServerName()
         {
             try { return new Uri(RevivalMod.Config.ServerUrl).Host; } catch { return RevivalMod.Config.ServerUrl; }

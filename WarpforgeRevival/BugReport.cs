@@ -782,8 +782,6 @@ namespace WarpforgeRevival
                 }
             }
 
-            [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
-
             private static void Send()
             {
                 if ((d.Title ?? "").Trim().Length < 3) { status = "Give it a title (what went wrong, at least 3 letters)."; problem = true; return; }

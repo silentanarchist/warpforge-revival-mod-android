@@ -218,7 +218,7 @@ namespace WarpforgeRevival
                             text = "Invited " + (string.IsNullOrEmpty(name) ? "that player" : name);
                             good = true;
                         }
-                        else text = reply.Error ?? "The server refused the invitation";
+                        else text = reply.Unreachable ? "Could not reach the server" : (reply.Error ?? "The server refused the invitation").TrimEnd('.');
                     }
                     catch (Exception e) { text = "Could not reach the server"; RevivalMod.Log.Warning("[alliances] invite by friend code: " + e.Message); }
                     MainThread.Enqueue(() =>

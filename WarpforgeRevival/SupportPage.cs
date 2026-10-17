@@ -205,6 +205,7 @@ namespace WarpforgeRevival
             var old = parent.Find(CheckName);
             if ((object)old != null) { check = old; return; }        // set up already (the page was set up again)
             var go = CopyButton(faq, parent, CheckName, CheckText, OnCheck, "update", out checkLabel);
+            if ((object)go == null) return;
             check = go.transform;
             check.SetSiblingIndex(faqT.GetSiblingIndex() + 1);
             // no layout group to stack them: put the copy below by hand
@@ -257,6 +258,7 @@ namespace WarpforgeRevival
             var old = parent.Find(ReportName);
             if ((object)old != null) { report = old; return; }
             var go = CopyButton(faq, parent, ReportName, "Report a bug", BugReport.Request, "report", out _);
+            if ((object)go == null) return;
             report = go.transform;
             report.SetSiblingIndex(check.GetSiblingIndex() + 1);
             if ((object)parent.GetComponent<UnityEngine.UI.LayoutGroup>() == null)
@@ -281,6 +283,7 @@ namespace WarpforgeRevival
             var old = parent.Find(ExportName);
             if ((object)old != null) { export = old; exportLabel = old.GetComponentInChildren<TMP_Text>(true); return; }
             var go = CopyButton(faq, parent, ExportName, CardArtExport.Running ? "Exporting card art..." : ExportText, OnExport, "export", out exportLabel);
+            if ((object)go == null) return;
             export = go.transform;
             var after = (object)report != null && report.Pointer != IntPtr.Zero ? report : check;
             export.SetSiblingIndex(after.GetSiblingIndex() + 1);
@@ -312,6 +315,7 @@ namespace WarpforgeRevival
                 ReplayCodes.WatchStatus = text => { WatchLabel(string.IsNullOrEmpty(text) ? WatchText : text); watchResetAt = Time.realtimeSinceStartup + 4f; };
                 ReplayCodes.WatchFromClipboard();
             }, "watch", out watchLabel);
+            if ((object)go == null) return;
             watch = go.transform;
             var le = go.GetComponent<UnityEngine.UI.LayoutElement>() ?? go.AddComponent<UnityEngine.UI.LayoutElement>();
             le.ignoreLayout = true;                     // not stacked with the first column
@@ -551,7 +555,7 @@ namespace WarpforgeRevival
             label = go.GetComponentInChildren<TMP_Text>(true);
             Ui.SetText(label, text);
             var button = go.GetComponent<UnityEngine.UI.Button>() ?? go.GetComponentInChildren<UnityEngine.UI.Button>(true);
-            if ((object)button == null) { RevivalMod.Log.Warning($"[support] the {what} button has no button to click"); return go; }
+            if ((object)button == null) { RevivalMod.Log.Warning($"[support] the {what} button has no button to click"); return null; }
             button.onClick.AddListener(Il2CppInterop.Runtime.DelegateSupport.ConvertDelegate<UnityEngine.Events.UnityAction>(new Action(click)));
             return go;
         }

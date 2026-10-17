@@ -42,7 +42,7 @@ namespace WarpforgeRevival
         public static void Pump()
         {
             int n = 0;
-            while (n++ < 32 && MainThread.TryDequeue(out var a))
+            while (n++ < 128 && MainThread.TryDequeue(out var a))
             {
                 try { a(); }
                 catch (Exception e) { RevivalMod.Log.Error("[playfab] callback failed: " + e); }

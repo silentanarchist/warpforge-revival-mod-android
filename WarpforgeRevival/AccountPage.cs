@@ -153,7 +153,7 @@ namespace WarpforgeRevival
                     });
                     string login = op == "unlink" ? GameSignIn.Token() : null;      // the one saved sign-in to cancel
                     var extra = login != null ? new[] { new System.Collections.Generic.KeyValuePair<string, string>("X-Revival-Login", login) } : null;
-                    var reply = await Net.PostJson("/playfab/Revival/AccountLink", body, TimeSpan.FromSeconds(15), extra);
+                    var reply = await Net.PostJson("/playfab/Revival/AccountLink", body, TimeSpan.FromSeconds(15), extra, retry: true);
                     if (reply.Ok)
                     {
                         var data = reply.Data;

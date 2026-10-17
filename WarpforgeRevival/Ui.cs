@@ -65,7 +65,9 @@ namespace WarpforgeRevival
         /// game build lacks GUI.matrix): this is the scale.</summary>
         internal static float GuiScale() => Mathf.Max(0.5f, Mathf.Min(Screen.width / 1280f, Screen.height / 720f));
 
-        /// <summary>Opens a web address in the player's browser.</summary>
+        /// <summary>Opens a web address in the player's browser. Kept apart (never inlined) so that a game build missing
+        /// Application.OpenURL fails inside the caller's try, not in the code drawing the window.</summary>
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.NoInlining)]
         internal static void OpenUrl(string url) => Application.OpenURL(url);
     }
 }

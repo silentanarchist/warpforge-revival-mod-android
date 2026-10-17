@@ -43,7 +43,7 @@ namespace WarpforgeRevival
         {
             try
             {
-                var reply = await Net.PostJson("/playfab/Revival/MatchTicket", "{}", TimeSpan.FromSeconds(10));
+                var reply = await Net.PostJson("/playfab/Revival/MatchTicket", "{}", TimeSpan.FromSeconds(10), retry: true);
                 var data = reply.Data;
                 if (reply.Ok && data.ValueKind == System.Text.Json.JsonValueKind.Object && data.TryGetProperty("ticket", out var t))
                 {

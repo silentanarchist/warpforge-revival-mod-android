@@ -162,7 +162,7 @@ namespace WarpforgeRevival
                 try
                 {
                     var reply = await Net.PostJson("/playfab/Revival/PlayerStats",
-                        JsonSerializer.Serialize(new Dictionary<string, string> { ["playerId"] = playerId }), TimeSpan.FromSeconds(10));
+                        JsonSerializer.Serialize(new Dictionary<string, string> { ["playerId"] = playerId }), TimeSpan.FromSeconds(10), retry: true);
                     var data = reply.Data;
                     if (reply.Ok && data.ValueKind == JsonValueKind.Object && data.TryGetProperty("total", out var total))
                     {

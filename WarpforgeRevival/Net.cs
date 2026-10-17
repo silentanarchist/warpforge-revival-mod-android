@@ -83,10 +83,12 @@ namespace WarpforgeRevival
         /// POSTs <paramref name="json"/> to the revival server at <paramref name="path"/> ("/playfab/Revival/..."),
         /// with the game's session (X-Authorization) when signed in and any <paramref name="headers"/>. A connection
         /// that fails before an answer is tried once more on a new one (the usual cause is a kept-open connection
-        /// the server had already closed). Never throws.
+        /// the server had already closed) when <paramref name="retry"/> is set: only for calls a repeat does no harm
+        /// to. Never throws.
         /// </summary>
         internal static async System.Threading.Tasks.Task<Reply> PostJson(string path, string json, TimeSpan timeout,
-            System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> headers = null, bool session = true)
+            System.Collections.Generic.IEnumerable<System.Collections.Generic.KeyValuePair<string, string>> headers = null, bool session = true,
+            bool retry = false)
         {
             var result = new Reply();
             string ticket = session ? PlayFabTransport.SessionTicket : null;
@@ -113,7 +115,14 @@ namespace WarpforgeRevival
                         result.Data = data;
                         return result;
                     }
-                    if (parsed && root.ValueKind == System.Text.Json.JsonValueKind.Object)
+                    if (!parsed || root.ValueKind != System.Text.Json.JsonValueKind.Object)
+                    {
+                        // not the server's own answer (a proxy's or a network's error page): as the hand-built calls
+                        // treated it, the server could not be reached
+                        result.Unreachable = true;
+                        result.Error = "Could not reach the server.";
+                        return result;
+                    }
                     {
                         result.Code = root.TryGetProperty("error", out var ec) && ec.ValueKind == System.Text.Json.JsonValueKind.String ? ec.GetString() : null;
                         string why = root.TryGetProperty("errorMessage", out var em) && em.ValueKind == System.Text.Json.JsonValueKind.String ? em.GetString() : null;
@@ -122,7 +131,9 @@ namespace WarpforgeRevival
                     result.Error ??= "The server did not accept that (" + result.Status + ").";
                     return result;
                 }
-                catch (Exception e) when (attempt == 1 && e is HttpRequestException)
+                // tried again only where a repeat does no harm (retry: true); the server does not recognise a repeated
+                // /Revival/ call, and a failed connection may have reached it
+                catch (Exception e) when (retry && attempt == 1 && e is HttpRequestException)
                 {
                     await System.Threading.Tasks.Task.Delay(500);
                 }
